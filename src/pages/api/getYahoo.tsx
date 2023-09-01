@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import puppeteer from 'puppeteer';
 import { MatchupData } from '@/components/Matchup/MatchupData';
 import { PlayerData } from '@/components/Player/PlayerData';
-import {delay, getElementByContent, getElementByTitle, loadCookies, openPage, saveCookies, swapOutTestData, updateMatchupData} from './apiHelpers';
+import {delay, getElementByContent, getElementByTitle, isPlayerStarting, loadCookies, openPage, saveCookies, swapOutTestData, updateMatchupData} from './apiHelpers';
   
 const getYahoo = async (req: NextApiRequest, res: NextApiResponse) => {    
     //recieve input from request body, parse from json
@@ -12,14 +12,14 @@ const getYahoo = async (req: NextApiRequest, res: NextApiResponse) => {
     let {league} = JSON.parse(req.body);
     console.log('input', input);
 
-    const browser = await puppeteer.launch({headless:true, args:[
-        '--user-data-dir=E:/ChromeProfiles/AdditionalProfiles/User Data']
-        });
+    // const browser = await puppeteer.launch({headless:true, args:[
+    //     `--user-data-dir=${process.env.REACT_APP_DATAL}`]
+    //     });
 
-        // const browser = await puppeteer.launch({headless:true});
+        const browser = await puppeteer.launch({headless:true});
 
       const page = await browser.newPage();
-      await loadCookies(page, league);
+    //   await loadCookies(page, league);
 
       await page.setViewport({ width: 1920, height: 1080});
       await openPage(page, `https://football.fantasysports.yahoo.com/f1/${league}/matchup`);
@@ -44,6 +44,7 @@ const getYahoo = async (req: NextApiRequest, res: NextApiResponse) => {
 
   let firstBench = false;
   const rows = await page.$$('table.Datatable tr');
+  let count = 0;
   for (const row of rows) {
     //skip non-valid rows
     let rowIsValid = await row.$$('td.player');
@@ -94,7 +95,7 @@ const getYahoo = async (req: NextApiRequest, res: NextApiResponse) => {
       {
         let text = await getElementByContent(playerTag[0]);
         if (text && text.length > 1) {
-            homePlayerPosition = text.split(" - ")[1];
+            awayPlayerPosition = text.split(" - ")[1];
         }
       }
     }
@@ -148,20 +149,19 @@ const getYahoo = async (req: NextApiRequest, res: NextApiResponse) => {
         awayPlayerFromUILastUpdate = awayPlayerFromUI.awayPlayerLastUpdate;
     }
 
-    let playerData = new PlayerData(homePlayerFromUIName, homeUpdatedPlayerName,homePlayerPosition,homePlayerFromUIPoints,homeUpdatedPlayerPoints, homePlayerFromUIPointDiff, homePlayerFromUILastUpdate,
-                                    awayPlayerFromUIName, awayUpdatedPlayerName, awayPlayerPosition,awayPlayerFromUIPoints,awayUpdatedPlayerPoints, awayPlayerFromUIPointDiff, awayPlayerFromUILastUpdate,
-                                    matchupPosition != "BN" && matchupPosition != "IR");
-
     //add break in first bench position
-    if(!playerData.isStarter && !firstBench)
+    if(!isPlayerStarting(matchupPosition) && !firstBench)
     {
-        syncedMatchupData.playerDatas.push(new PlayerData('BENCH','BENCH','BENCH',0,0,0,'','BENCH','BENCH','BENCH',0,0,0,'',false));
+        syncedMatchupData.playerDatas.push(new PlayerData(count++, 'BENCH','BENCH','BENCH',0,0,0,'','BENCH','BENCH','BENCH',0,0,0,'',false));
         firstBench = true;
     }
     else if((homeUpdatedPlayerName == '' && awayUpdatedPlayerName == '') || matchupPosition == "IR")
     {
       continue;
     }
+    let playerData = new PlayerData(count++, homePlayerFromUIName, homeUpdatedPlayerName,homePlayerPosition,homePlayerFromUIPoints,homeUpdatedPlayerPoints, homePlayerFromUIPointDiff, homePlayerFromUILastUpdate,
+        awayPlayerFromUIName, awayUpdatedPlayerName, awayPlayerPosition,awayPlayerFromUIPoints,awayUpdatedPlayerPoints, awayPlayerFromUIPointDiff, awayPlayerFromUILastUpdate,
+        isPlayerStarting(matchupPosition));
     syncedMatchupData.playerDatas.push(playerData);
   }
 
@@ -169,7 +169,7 @@ const getYahoo = async (req: NextApiRequest, res: NextApiResponse) => {
 
   const matchupData = updateMatchupData(syncedMatchupData);
   console.log('matchupdata', matchupData);
-  await saveCookies(page,league);
+//   await saveCookies(page,league);
 
   res.status(200).json({matchupData});
   browser.close();

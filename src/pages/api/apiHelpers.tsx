@@ -51,6 +51,10 @@ export async function saveCookies(page: Page, name: string){
     });
 }
 
+export function isPlayerStarting(text: string){
+    return text !== "BN" && text !== "IR" && text !== "BENCH" && text !== "Bench";
+}
+
 export function updateMatchupData(matchupData: MatchupData)
 {
 

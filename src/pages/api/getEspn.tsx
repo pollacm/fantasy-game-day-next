@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import puppeteer from 'puppeteer';
 import { MatchupData } from '@/components/Matchup/MatchupData';
 import { PlayerData } from '@/components/Player/PlayerData';
-import {delay, getElementByTitle, loadCookies, openPage, saveCookies, swapOutTestData, updateMatchupData} from './apiHelpers';
+import {delay, getElementByTitle, isPlayerStarting, loadCookies, openPage, saveCookies, swapOutTestData, updateMatchupData} from './apiHelpers';
   
 const getEspn = async (req: NextApiRequest, res: NextApiResponse) => {    
     //recieve input from request body, parse from json
@@ -10,13 +10,13 @@ const getEspn = async (req: NextApiRequest, res: NextApiResponse) => {
     let syncedMatchupData = new MatchupData('','',[]);
     let {input} = JSON.parse(req.body);
     console.log('input', input);
-
+    console.log('user data location', process.env.REACT_APP_DATAL);
     const browser = await puppeteer.launch({headless:true, args:[
-        '--user-data-dir=E:/ChromeProfiles/AdditionalProfiles/User Data']
+        `--user-data-dir=${process.env.REACT_APP_DATAL}`]
         });
 
       const page = await browser.newPage();
-      await loadCookies(page, 'espn');
+      // await loadCookies(page, 'espn');
 
       await page.setViewport({ width: 1920, height: 1080});
       await openPage(page, `https://fantasy.espn.com/football/fantasycast?leagueId=127291`);
@@ -41,7 +41,7 @@ const getEspn = async (req: NextApiRequest, res: NextApiResponse) => {
         {        
           console.log('setting user')
           await frame.click('input.input-InputLoginValue'); 
-          delay(500);
+          delay(1000);
           // @ts-ignore
           await username?.type(process.env.REACT_APP_EU);
         }
@@ -49,9 +49,10 @@ const getEspn = async (req: NextApiRequest, res: NextApiResponse) => {
         const password = await frame.$('input.input-InputPassword');
         console.log('setting pass')
         await frame.click('input.input-InputPassword'); 
-        await delay(500);
+        await delay(2000);
         // @ts-ignore
         await password?.type(process.env.REACT_APP_EP);
+        await delay(500);
         console.log('submitting login')
         await frame.click('#BtnSubmit')
         await delay(5000);
@@ -76,6 +77,7 @@ const getEspn = async (req: NextApiRequest, res: NextApiResponse) => {
   }
   
   const rows = await page.$$('.Table__TBODY tr');
+  let count = 0;
   for (const row of rows) {
     // player name    
     let playerNameElements = await row.$$('div.player-column__athlete');
@@ -164,9 +166,9 @@ const getEspn = async (req: NextApiRequest, res: NextApiResponse) => {
           awayPlayerFromUILastUpdate = awayPlayerFromUI.awayPlayerLastUpdate;
       }
 
-      let playerData = new PlayerData(homePlayerFromUIName, homeUpdatedPlayerName,homePlayerPosition,homePlayerFromUIPoints,homeUpdatedPlayerPoints, homePlayerFromUIPointDiff, homePlayerFromUILastUpdate,
+      let playerData = new PlayerData(count++, homePlayerFromUIName, homeUpdatedPlayerName,homePlayerPosition,homePlayerFromUIPoints,homeUpdatedPlayerPoints, homePlayerFromUIPointDiff, homePlayerFromUILastUpdate,
                                       awayPlayerFromUIName, awayUpdatedPlayerName, awayPlayerPosition,awayPlayerFromUIPoints,awayUpdatedPlayerPoints, awayPlayerFromUIPointDiff, awayPlayerFromUILastUpdate,
-                                      matchupPosition != "Bench" && matchupPosition != "IR");
+                                      isPlayerStarting(matchupPosition));
       syncedMatchupData.playerDatas.push(playerData);
     }
   }
@@ -175,7 +177,7 @@ const getEspn = async (req: NextApiRequest, res: NextApiResponse) => {
 
   const matchupData = updateMatchupData(syncedMatchupData);
   console.log('matchupdata', matchupData);
-  await saveCookies(page, 'espn');
+  // await saveCookies(page, 'espn');
 
   res.status(200).json({matchupData});
   browser.close();
