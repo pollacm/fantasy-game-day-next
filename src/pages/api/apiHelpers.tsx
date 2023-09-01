@@ -1,4 +1,4 @@
-import { Page } from "puppeteer";
+import { ElementHandle, Page } from "puppeteer";
 import fs from 'fs'
 
 export function delay(time: any) {
@@ -6,6 +6,11 @@ export function delay(time: any) {
         setTimeout(resolve, time)
     });
   }
+
+export async function getElementByTitle(element: ElementHandle<Element>)
+{
+    return await element.evaluate(el => el.getAttribute('title'))
+}
 
 export async function loadCookies(page: Page) {
     const loadedCookie = fs.readFile("E:/Source/Repos/cookies.txt", (err) => {
@@ -18,7 +23,6 @@ export async function loadCookies(page: Page) {
         const parsedCookie = JSON.parse(loadedCookie);
         await page.setCookie(...parsedCookie);
       }
-      console.log('cookies loaded')
 }
 
 export async function openPage(page: Page, url: string)
