@@ -2,10 +2,15 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import puppeteer from 'puppeteer';
 import { MatchupData } from '@/components/Matchup/MatchupData';
 import { PlayerData } from '@/components/Player/PlayerData';
-import {delay, getElementByTitle, loadCookies, openPage, saveCookies} from './apiHelpers';
+import {delay, getElementByTitle, loadCookies, openPage, saveCookies, swapOutTestData, updateMatchupData} from './apiHelpers';
   
 const getEspn = async (req: NextApiRequest, res: NextApiResponse) => {    
-          const browser = await puppeteer.launch({headless:true, args:[
+    //recieve input from request body, parse from json
+    let {espnMatchupData} :{espnMatchupData: MatchupData} = JSON.parse(req.body);
+    let {input} = JSON.parse(req.body);
+    console.log('input', input);
+
+    const browser = await puppeteer.launch({headless:true, args:[
         '--user-data-dir=E:/ChromeProfiles/AdditionalProfiles/User Data']
         });
 
@@ -44,18 +49,16 @@ const getEspn = async (req: NextApiRequest, res: NextApiResponse) => {
       await openPage(page, `https://fantasy.espn.com/football/fantasycast?leagueId=127291`);
   }
 
-  let matchupData = new MatchupData('','', []);
-
   const teamNameElements = await page.$$('.teamName');
   
   if(teamNameElements.length == 2){
     let title = await getElementByTitle(teamNameElements[0]);
     if(title != null){
-      matchupData.homeTeamName = title;
+      espnMatchupData.homeTeamName = title;
     }
     title = await getElementByTitle(teamNameElements[1]);
     if(title != null){
-      matchupData.awayTeamName = title;
+      espnMatchupData.awayTeamName = title;
     }
   }
   else{
@@ -66,20 +69,20 @@ const getEspn = async (req: NextApiRequest, res: NextApiResponse) => {
   for (const row of rows) {
     // player name
     let playerNameElements = await row.$$('div.player-column__athlete');
-    let homePlayerName = '';
-    let awayPlayerName = '';
+    let homeUpdatedPlayerName = '';
+    let awayUpdatedPlayerName = '';
     if (playerNameElements.length == 2) {
       let text = await getElementByTitle(playerNameElements[0]);
       if (text) {
-        homePlayerName = text;
+        homeUpdatedPlayerName = text;
       }
 
       text = await getElementByTitle(playerNameElements[1]);
       if (text) {
-        awayPlayerName = text;
+        awayUpdatedPlayerName = text;
       }
     }
-    if(homePlayerName == '' && awayPlayerName == '')
+    if(homeUpdatedPlayerName == '' && awayUpdatedPlayerName == '')
     {
       continue;
     }
@@ -102,16 +105,16 @@ const getEspn = async (req: NextApiRequest, res: NextApiResponse) => {
 
     //player points
     let playePointsElements = await row.$$('td div.points-column');
-    let homePlayerPoints = 0.00;
-    let awayPlayerPoints = 0.00;
+    let homeUpdatedPlayerPoints = 0.00;
+    let awayUpdatedPlayerPoints = 0.00;
     if (playePointsElements.length == 2) {
       let text = await playePointsElements[0].evaluate(el => el.textContent);
       let points = Number(text);
-      homePlayerPoints = points != null && !isNaN(points) ? points : 0;
+      homeUpdatedPlayerPoints = points != null && !isNaN(points) ? points : 0;
 
       text = await playePointsElements[1].evaluate(el => el.textContent);
       points = Number(text);
-      awayPlayerPoints = points != null && !isNaN(points) ? points : 0;
+      awayUpdatedPlayerPoints = points != null && !isNaN(points) ? points : 0;
     }
 
     //is bench
@@ -124,13 +127,46 @@ const getEspn = async (req: NextApiRequest, res: NextApiResponse) => {
       }
     }
     if(matchupPosition != "Bench" && matchupPosition != "IR"){
-      let playerData = new PlayerData(homePlayerName,homePlayerPosition,homePlayerPoints, awayPlayerName, awayPlayerPosition,awayPlayerPoints, matchupPosition != "Bench" && matchupPosition != "IR");
-      matchupData.playerDatas.push(playerData);
+      
+      let homePlayerFromUI = espnMatchupData.playerDatas.find((element) => element.homePlayerName === homeUpdatedPlayerName);
+      let homePlayerFromUIName = '';
+      let homePlayerFromUIPoints = 0.00;
+      let homePlayerFromUIPointDiff = 0.00;
+      let homePlayerFromUILastUpdate = '';
+
+      if(homePlayerFromUI != null){
+          homePlayerFromUIName = homePlayerFromUI.homePlayerName;
+          homePlayerFromUIPoints = homePlayerFromUI.homePlayerPoints;
+          homePlayerFromUIPointDiff = homePlayerFromUI.homePlayerPointDiff;
+          homePlayerFromUILastUpdate = homePlayerFromUI.homePlayerLastUpdate;
+      }
+
+      let awayPlayerFromUI = espnMatchupData.playerDatas.find((element) => element.awayPlayerName === awayUpdatedPlayerName);
+      let awayPlayerFromUIName = '';
+      let awayPlayerFromUIPoints = 0.00;
+      let awayPlayerFromUIPointDiff = 0.00;
+      let awayPlayerFromUILastUpdate = '';
+
+      if(awayPlayerFromUI != null){
+          awayPlayerFromUIName = awayPlayerFromUI.awayPlayerName;
+          awayPlayerFromUIPoints = awayPlayerFromUI.awayPlayerPoints;
+          awayPlayerFromUIPointDiff = awayPlayerFromUI.awayPlayerPointDiff;
+          awayPlayerFromUILastUpdate = awayPlayerFromUI.awayPlayerLastUpdate;
+      }
+
+      let playerData = new PlayerData(homePlayerFromUIName, homeUpdatedPlayerName,homePlayerPosition,homePlayerFromUIPoints,homeUpdatedPlayerPoints, homePlayerFromUIPointDiff, homePlayerFromUILastUpdate,
+                                      awayPlayerFromUIName, awayUpdatedPlayerName, awayPlayerPosition,awayPlayerFromUIPoints,awayUpdatedPlayerPoints, awayPlayerFromUIPointDiff, awayPlayerFromUILastUpdate,
+                                      matchupPosition != "Bench" && matchupPosition != "IR");
+      espnMatchupData.playerDatas.push(playerData);
     }
   }
+
+  espnMatchupData = swapOutTestData(espnMatchupData, input);
+
+  const matchupData = updateMatchupData(espnMatchupData);
   console.log('matchupdata', matchupData);
   saveCookies(page);
-  
+
   res.status(200).json({matchupData});
   browser.close();
 }

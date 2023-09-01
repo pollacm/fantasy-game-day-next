@@ -3,11 +3,12 @@
 // import {type NextPage} from 'next'
 import Matchup from '@/components/Matchup/Matchup'
 import { MatchupData } from '@/components/Matchup/MatchupData';
+import { match } from 'assert';
 import { useState } from 'react';
 
 export default function Home() {
   const [downloads, setDownloads] = useState<string>('');
-  const [espnMatchupData, setEspnMatchupData] = useState<MatchupData>();
+  const [espnMatchupData, setEspnMatchupData] = useState<MatchupData>(new MatchupData('','', []));
   const [input, setInput] = useState<string>('');
   
   const getDownloads = async () => {
@@ -22,7 +23,7 @@ export default function Home() {
   const getEspn = async () => {
     const res = await fetch('http://localhost:3000/api/getEspn', {
       method: 'POST',
-      body: JSON.stringify({input})
+      body: JSON.stringify({espnMatchupData, input})
     })
     console.log('out of api')
     const { matchupData } = await res.json();
@@ -43,7 +44,17 @@ export default function Home() {
       value={input}
       /> */}
       {/* <button onClick={getDownloads} type='button' className='rounded-lg'>Go</button> */}
+
+      <input 
+      type='textbox' 
+      className='rounded-lg' 
+      onChange={(e) => setInput(e.target.value)}
+      value={input}
+      />
+      {/* <button onClick={getDownloads} type='button' className='rounded-lg'>Go</button> */}
       <button onClick={getEspn} type='button' className='rounded-lg'>Go</button>
+
+
       {downloads && <p className='text-sm'>This package has {downloads} downloads.</p>}
       <div style={{display: 'block'}}>
         {espnMatchupData && <Matchup league="R.M.L." matchupData={espnMatchupData}></Matchup> }
