@@ -9,6 +9,7 @@ import { useState } from 'react';
 export default function Home() {
   const [downloads, setDownloads] = useState<string>('');
   const [espnMatchupData, setEspnMatchupData] = useState<MatchupData>(new MatchupData('','', []));
+  const [yahooMatchupData, setYahooMatchupData] = useState<MatchupData>(new MatchupData('','', []));
   const [input, setInput] = useState<string>('');
   
   const getDownloads = async () => {
@@ -18,6 +19,12 @@ export default function Home() {
     })
     const { downloads } = await res.json();
     setDownloads(downloads);
+  }
+
+  const getData = async () => {
+    getEspn();
+    getYahooReplacements();
+
   }
 
   const getEspn = async () => {
@@ -31,10 +38,22 @@ export default function Home() {
     console.log(matchupData);
   }
 
+  const getYahooReplacements = async () => {
+    const res = await fetch('http://localhost:3000/api/getYahoo', {
+      method: 'POST',
+      body: JSON.stringify({yahooMatchupData, league: '32919', input: ''})
+    })
+    console.log('out of api')
+    const { matchupData } = await res.json();
+    setYahooMatchupData(matchupData);
+    console.log(matchupData);
+  }
 
   return (
     <main className="flex min-h-screen flex-col p-12">
       {/* https://www.youtube.com/watch?v=bGShHOOoC-U */}
+
+      {/* https://codesandbox.io/s/awesome-napier-rnveq?fontsize=14 */}
 
       
       {/* <input 
@@ -52,12 +71,13 @@ export default function Home() {
       value={input}
       />
       {/* <button onClick={getDownloads} type='button' className='rounded-lg'>Go</button> */}
-      <button onClick={getEspn} type='button' className='rounded-lg'>Go</button>
+      <button onClick={getData} type='button' className='rounded-lg'>Go</button>
 
 
       {downloads && <p className='text-sm'>This package has {downloads} downloads.</p>}
       <div style={{display: 'block'}}>
         {espnMatchupData && <Matchup league="R.M.L." matchupData={espnMatchupData}></Matchup> }
+        {yahooMatchupData && <Matchup league="The Replacements" matchupData={yahooMatchupData}></Matchup> }
         {/* <Matchup league="T.R.L."></Matchup>
         <Matchup league="P.J.V."></Matchup>
         <Matchup league="Soopa Brawl"></Matchup>

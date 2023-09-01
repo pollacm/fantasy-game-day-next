@@ -15,6 +15,11 @@ margin-right: 15px;
     font-weight: bold;
 }
 
+.bench {
+    font-size: 11px;
+    font-weight: bold;
+}
+
 .name {
     font-size: 11px;
     width: 70%;

@@ -15,8 +15,13 @@ export async function getElementByTitle(element: ElementHandle<Element>)
     return await element.evaluate(el => el.getAttribute('title'))
 }
 
-export async function loadCookies(page: Page) {
-    const loadedCookie = fs.readFile("E:/Source/Repos/cookies.txt", (err) => {
+export async function getElementByContent(element: ElementHandle<Element>)
+{
+    return await element.evaluate(el => el.textContent)
+}
+
+export async function loadCookies(page: Page, name: string) {
+    const loadedCookie = fs.readFile(`E:/Source/Repos/cookies-${name}.txt`, (err) => {
         if (err)
           console.log(err);
         else {
@@ -36,9 +41,9 @@ export async function openPage(page: Page, url: string)
   });
 }
 
-export async function saveCookies(page: Page){
+export async function saveCookies(page: Page, name: string){
     const cookies = await page.cookies();
-    await fs.writeFile("E:/Source/Repos/cookies.txt", JSON.stringify(cookies), (err) => {
+    await fs.writeFile(`E:/Source/Repos/cookies-${name}.txt`, JSON.stringify(cookies), (err) => {
       if (err)
         console.log(err);
       else {

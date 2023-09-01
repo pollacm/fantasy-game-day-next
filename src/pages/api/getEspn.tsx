@@ -7,6 +7,7 @@ import {delay, getElementByTitle, loadCookies, openPage, saveCookies, swapOutTes
 const getEspn = async (req: NextApiRequest, res: NextApiResponse) => {    
     //recieve input from request body, parse from json
     let {espnMatchupData} :{espnMatchupData: MatchupData} = JSON.parse(req.body);
+    let syncedMatchupData = new MatchupData('','',[]);
     let {input} = JSON.parse(req.body);
     console.log('input', input);
 
@@ -15,7 +16,7 @@ const getEspn = async (req: NextApiRequest, res: NextApiResponse) => {
         });
 
       const page = await browser.newPage();
-      loadCookies(page);
+      await loadCookies(page, 'espn');
 
       await page.setViewport({ width: 1920, height: 1080});
       await openPage(page, `https://fantasy.espn.com/football/fantasycast?leagueId=127291`);
@@ -24,29 +25,38 @@ const getEspn = async (req: NextApiRequest, res: NextApiResponse) => {
     await page.waitForSelector('.teamName', { timeout: 10000 });
   }
   catch(err){
-      await openPage(page, `http://www.espn.com/login`);
-
-      const elementHandle = await page.waitForSelector('div#disneyid-wrapper iframe');
+      // await openPage(page, `http://www.espn.com/login`);
+      console.log('espn failed login.. attempting to login')
+      const elementHandle = await page.waitForSelector('div#oneid-wrapper iframe');
       const frame = await elementHandle?.contentFrame();
+      console.log('looking for frame')
       if(frame != null){      
-        await frame.waitForSelector('[ng-model="vm.password"]');
-        await delay(1500);
+        console.log('frame found')
+        await frame.waitForSelector('input.input-InputPassword');
+        console.log('waiting for pass')
         
-        const username = await frame.$('[ng-model="vm.username"]');
+        console.log('looking for user')
+        const username = await frame.$('input.input-InputLoginValue');
         if(username) 
         {        
+          console.log('setting user')
+          await frame.click('input.input-InputLoginValue'); 
+          delay(500);
           // @ts-ignore
           await username?.type(process.env.REACT_APP_EU);
         }
-        await delay(1500);
-        const password = await frame.$('[ng-model="vm.password"]');
+        console.log('waiting for pass')
+        const password = await frame.$('input.input-InputPassword');
+        console.log('setting pass')
+        await frame.click('input.input-InputPassword'); 
+        await delay(500);
         // @ts-ignore
         await password?.type(process.env.REACT_APP_EP);
-        await frame.click('button[type=submit]')
-        await page.waitForNavigation();
+        console.log('submitting login')
+        await frame.click('#BtnSubmit')
+        await delay(5000);
+        console.log('completed login')
       }
-
-      await openPage(page, `https://fantasy.espn.com/football/fantasycast?leagueId=127291`);
   }
 
   const teamNameElements = await page.$$('.teamName');
@@ -54,20 +64,20 @@ const getEspn = async (req: NextApiRequest, res: NextApiResponse) => {
   if(teamNameElements.length == 2){
     let title = await getElementByTitle(teamNameElements[0]);
     if(title != null){
-      espnMatchupData.homeTeamName = title;
+      syncedMatchupData.homeTeamName = title;
     }
     title = await getElementByTitle(teamNameElements[1]);
     if(title != null){
-      espnMatchupData.awayTeamName = title;
+      syncedMatchupData.awayTeamName = title;
     }
   }
   else{
     res.status(400);
   }
-
+  
   const rows = await page.$$('.Table__TBODY tr');
   for (const row of rows) {
-    // player name
+    // player name    
     let playerNameElements = await row.$$('div.player-column__athlete');
     let homeUpdatedPlayerName = '';
     let awayUpdatedPlayerName = '';
@@ -157,15 +167,15 @@ const getEspn = async (req: NextApiRequest, res: NextApiResponse) => {
       let playerData = new PlayerData(homePlayerFromUIName, homeUpdatedPlayerName,homePlayerPosition,homePlayerFromUIPoints,homeUpdatedPlayerPoints, homePlayerFromUIPointDiff, homePlayerFromUILastUpdate,
                                       awayPlayerFromUIName, awayUpdatedPlayerName, awayPlayerPosition,awayPlayerFromUIPoints,awayUpdatedPlayerPoints, awayPlayerFromUIPointDiff, awayPlayerFromUILastUpdate,
                                       matchupPosition != "Bench" && matchupPosition != "IR");
-      espnMatchupData.playerDatas.push(playerData);
+      syncedMatchupData.playerDatas.push(playerData);
     }
   }
 
-  espnMatchupData = swapOutTestData(espnMatchupData, input);
+  syncedMatchupData = swapOutTestData(syncedMatchupData, input);
 
-  const matchupData = updateMatchupData(espnMatchupData);
+  const matchupData = updateMatchupData(syncedMatchupData);
   console.log('matchupdata', matchupData);
-  saveCookies(page);
+  await saveCookies(page, 'espn');
 
   res.status(200).json({matchupData});
   browser.close();

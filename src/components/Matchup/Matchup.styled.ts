@@ -6,6 +6,7 @@ display: inline-block;
 width: 20%;
 border: 3px solid #73AD21;
 text-align: left;
+vertical-align: top;
 
 div {
     display: inline-block;
