@@ -12,14 +12,14 @@ const getYahoo = async (req: NextApiRequest, res: NextApiResponse) => {
     let {league} = JSON.parse(req.body);
     console.log('input', input);
 
-    // const browser = await puppeteer.launch({headless:true, args:[
-    //     '--user-data-dir=E:/ChromeProfiles/AdditionalProfiles/User Data']
-    //     });
+    const browser = await puppeteer.launch({headless:true, args:[
+        '--user-data-dir=E:/ChromeProfiles/AdditionalProfiles/User Data']
+        });
 
-        const browser = await puppeteer.launch({headless:true});
+        // const browser = await puppeteer.launch({headless:true});
 
       const page = await browser.newPage();
-    //   await loadCookies(page, league);
+      await loadCookies(page, league);
 
       await page.setViewport({ width: 1920, height: 1080});
       await openPage(page, `https://football.fantasysports.yahoo.com/f1/${league}/matchup`);
@@ -169,7 +169,7 @@ const getYahoo = async (req: NextApiRequest, res: NextApiResponse) => {
 
   const matchupData = updateMatchupData(syncedMatchupData);
   console.log('matchupdata', matchupData);
-//   await saveCookies(page,league);
+  await saveCookies(page,league);
 
   res.status(200).json({matchupData});
   browser.close();
