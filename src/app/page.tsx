@@ -11,13 +11,7 @@ export default function Home() {
   const [espnMatchupData, setEspnMatchupData] = useState<MatchupData>(new MatchupData('','', []));
   const [yahooMatchupData, setYahooMatchupData] = useState<MatchupData>(new MatchupData('','', []));
   const [input, setInput] = useState<string>('');
-  const [sub1, setSub1] = useState<string>('');
-  const [sub1Second, setSub1Second] = useState<string>('');
   
-  const setDropdown1 = (player: string) => {
-    setSub1(player);
-    setSub1Second('');
-  }
 
   const getDownloads = async () => {
     const res = await fetch('http://localhost:3000/api/getDownloads', {
@@ -83,25 +77,8 @@ export default function Home() {
 
       {downloads && <p className='text-sm'>This package has {downloads} downloads.</p>}
       <div style={{display: 'block'}}>
-        {espnMatchupData && <Matchup league="R.M.L." matchupData={espnMatchupData}></Matchup> }
-        {yahooMatchupData && <Matchup league="The Replacements" matchupData={yahooMatchupData}></Matchup> }
-        <div>
-          <select
-          onChange={(e) => setDropdown1(e.target.value)}>
-            <option></option>
-          {yahooMatchupData.playerDatas.filter(p => p.isStarter).map((p, index) =>
-            <option key={index} value={p.homePlayerPosition}>{p.homePlayerName}</option>
-          )};
-          </select>
-          <select
-          value={sub1Second}
-          onChange={(e) => setSub1Second(e.target.value)}>
-          <option></option>
-          {yahooMatchupData.playerDatas.filter(p => p.homePlayerPosition === sub1 && !p.isStarter).map((p, index) =>
-            <option key={index} value={p.homePlayerName}>{p.homePlayerName}</option>
-          )};
-          </select>
-        </div>
+        {espnMatchupData && <Matchup league="R.M.L." matchupData={espnMatchupData} subsEnabled={false} captainsEnabled={false}></Matchup> }
+        {yahooMatchupData && <Matchup league="The Replacements" matchupData={yahooMatchupData} subsEnabled={true} captainsEnabled={true}></Matchup> }        
         {/* <Matchup league="T.R.L."></Matchup>
         <Matchup league="P.J.V."></Matchup>
         <Matchup league="Soopa Brawl"></Matchup>
