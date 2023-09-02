@@ -8,8 +8,8 @@ import { useState } from 'react';
 
 export default function Home() {
   const [downloads, setDownloads] = useState<string>('');
-  const [espnMatchupData, setEspnMatchupData] = useState<MatchupData>(new MatchupData('','', []));
-  const [yahooMatchupData, setYahooMatchupData] = useState<MatchupData>(new MatchupData('','', []));
+  const [espnMatchupData, setEspnMatchupData] = useState<MatchupData>(new MatchupData('','', [], []));
+  const [yahooMatchupData, setYahooMatchupData] = useState<MatchupData>(new MatchupData('','', [], []));
   const [input, setInput] = useState<string>('');
   
 
@@ -35,7 +35,9 @@ export default function Home() {
     })
     console.log('out of api')
     const { matchupData } = await res.json();
+    
     setEspnMatchupData(matchupData);
+    
     console.log(matchupData);
   }
 

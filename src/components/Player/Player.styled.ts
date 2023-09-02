@@ -1,11 +1,9 @@
 import styled from 'styled-components';
 
 export const PlayerWrapper = styled.div`
-width: -webkit-fill-available;
-margin-right: 15px;
+width: 50% !important;
 
 .player-container {
-    width: 50%;
     height: 42px;
 }
 
@@ -16,6 +14,7 @@ margin-right: 15px;
 }
 
 .bench {
+    width: 100%;
     font-size: 11px;
     font-weight: bold;
 }
