@@ -1,7 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import puppeteer from 'puppeteer';
+import puppeteer from 'puppeteer-extra';
 import { MatchupData } from '@/components/Matchup/MatchupData';
 import { PlayerData } from '@/components/Player/PlayerData';
+import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+
 import {delay, getElementByTitle, isPlayerStarting, loadCookies, openPage, saveCookies, swapOutTestData, updateMatchupData} from './apiHelpers';
   
 const getEspn = async (req: NextApiRequest, res: NextApiResponse) => {    
@@ -11,8 +13,12 @@ const getEspn = async (req: NextApiRequest, res: NextApiResponse) => {
     let {input} = JSON.parse(req.body);
     console.log('input', input);
     console.log('user data location', process.env.REACT_APP_DATAL);
-    const browser = await puppeteer.launch({headless:true, args:[
-        `--user-data-dir=${process.env.REACT_APP_DATAL}`]
+
+    puppeteer.use(StealthPlugin());
+
+    const browser = await puppeteer.launch({headless:"new", executablePath:"C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",  
+    userDataDir:`${process.env.REACT_APP_DATAL}`
+    , args:['--disable-web-security', ' --disable-features=site-per-process']
         });
 
       const page = await browser.newPage();
@@ -167,10 +173,10 @@ const getEspn = async (req: NextApiRequest, res: NextApiResponse) => {
       }
 
       let homePlayerData = new PlayerData(count, homePlayerFromUIName, homeUpdatedPlayerName,homePlayerPosition,homePlayerFromUIPoints,homeUpdatedPlayerPoints, homePlayerFromUIPointDiff, homePlayerFromUILastUpdate,
-                                          isPlayerStarting(matchupPosition));
+                                         homePlayerFromUI?.subbedOutFor ?? '', homePlayerFromUI?.subbedInFor ?? '',  isPlayerStarting(matchupPosition));
 
       let awayPlayerData = new PlayerData(count++, awayPlayerFromUIName, awayUpdatedPlayerName, awayPlayerPosition,awayPlayerFromUIPoints,awayUpdatedPlayerPoints, awayPlayerFromUIPointDiff, awayPlayerFromUILastUpdate,
-                                          isPlayerStarting(matchupPosition));
+                                         awayPlayerFromUI?.subbedOutFor ?? '', awayPlayerFromUI?.subbedInFor ?? '',isPlayerStarting(matchupPosition));
                                           
       syncedMatchupData.homePlayers.push(homePlayerData);
       syncedMatchupData.awayPlayers.push(awayPlayerData);
