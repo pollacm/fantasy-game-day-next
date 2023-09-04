@@ -48,8 +48,13 @@ export default function Home() {
     })
     console.log('out of api')
     const { matchupData } = await res.json();
-    setYahooMatchupData(matchupData);
-    console.log(matchupData);
+    setYahooMatchupData({
+      ...matchupData,
+      homePlayers: matchupData.homePlayers,
+      awayPlayers: matchupData.awayPlayers
+
+    });
+    console.log(yahooMatchupData);
   }
 
   return (

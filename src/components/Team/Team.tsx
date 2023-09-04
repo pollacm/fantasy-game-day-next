@@ -5,17 +5,21 @@ import { TeamWrapper } from './Team.styled';
 import Player from '../Player/Player';
 import { PlayerData } from '../Player/PlayerData';
 
-interface TeamProps {homePlayer: PlayerData, awayPlayer: PlayerData}
+interface TeamProps {homePlayerName: string, homePlayerPosition:string, homePlayerPoints:number, homePlayerSubbedInFor:string, homePlayerSubbedOutFor:string, awayPlayer: PlayerData}
 
-const Team: FC<TeamProps> = ({homePlayer, awayPlayer}) => (
+const Team: FC<TeamProps> = ({homePlayerName, homePlayerPosition, homePlayerPoints, homePlayerSubbedInFor, homePlayerSubbedOutFor, awayPlayer}) => (
  <TeamWrapper data-testid="Team" style={{  backgroundColor: "red", display: 'inline-block' }}>
         
-        <Player playerPosition={homePlayer.playerPosition} 
-            playerName={homePlayer.playerName}
-            playerPoints={homePlayer.playerPoints} ></Player>
-        <Player playerPosition={awayPlayer.playerPosition}
+        <Player key="1" playerPosition={homePlayerPosition} 
+            playerName={homePlayerName}
+            playerPoints={homePlayerPoints} 
+            subbedInFor={homePlayerSubbedInFor}
+            subbedOutFor={homePlayerSubbedOutFor}></Player>
+        <Player key="2" playerPosition={awayPlayer.playerPosition}
             playerName={awayPlayer.playerName}
-            playerPoints={awayPlayer.playerPoints} ></Player>
+            playerPoints={awayPlayer.playerPoints} 
+            subbedInFor={awayPlayer.subbedInFor}
+            subbedOutFor={awayPlayer.subbedOutFor}></Player>
         
  </TeamWrapper>
 );

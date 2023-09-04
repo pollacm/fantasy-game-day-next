@@ -3,9 +3,9 @@
 import React, { FC } from 'react';
 import { PlayerWrapper } from './Player.styled';
 
-interface PlayerProps {playerPosition: string, playerName: string, playerPoints: number}
+interface PlayerProps {playerPosition: string, playerName: string, playerPoints: number, subbedInFor: string, subbedOutFor: string}
 
-const Player: FC<PlayerProps> = ({playerPosition, playerName, playerPoints}) => (
+const Player: FC<PlayerProps> = ({playerPosition, playerName, playerPoints, subbedInFor, subbedOutFor}) => (
  <PlayerWrapper data-testid="Player">
     {playerName !== "BENCH" ?
          <div className="player-container">
@@ -18,6 +18,12 @@ const Player: FC<PlayerProps> = ({playerPosition, playerName, playerPoints}) => 
          <div className="points">
             {playerPoints}
          </div>
+         {subbedInFor !== '' ? <div className="position">
+            {subbedInFor}
+         </div> : <></>}
+         {subbedOutFor !== '' ? <div className="position">
+            {subbedOutFor}
+         </div> : <></>}
        </div> :
        <div className="player-container">
        <div className="bench">
