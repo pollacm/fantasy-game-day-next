@@ -173,10 +173,10 @@ const getEspn = async (req: NextApiRequest, res: NextApiResponse) => {
       }
 
       let homePlayerData = new PlayerData(count, homePlayerFromUIName, homeUpdatedPlayerName,homePlayerPosition,homePlayerFromUIPoints,homeUpdatedPlayerPoints, homePlayerFromUIPointDiff, homePlayerFromUILastUpdate,
-                                         homePlayerFromUI?.subbedOutFor ?? '', homePlayerFromUI?.subbedInFor ?? '',  isPlayerStarting(matchupPosition));
+                                         homePlayerFromUI?.subbedOutFor ?? '', homePlayerFromUI?.subbedInFor ?? '', '',0, isPlayerStarting(matchupPosition));
 
       let awayPlayerData = new PlayerData(count++, awayPlayerFromUIName, awayUpdatedPlayerName, awayPlayerPosition,awayPlayerFromUIPoints,awayUpdatedPlayerPoints, awayPlayerFromUIPointDiff, awayPlayerFromUILastUpdate,
-                                         awayPlayerFromUI?.subbedOutFor ?? '', awayPlayerFromUI?.subbedInFor ?? '',isPlayerStarting(matchupPosition));
+                                         awayPlayerFromUI?.subbedOutFor ?? '', awayPlayerFromUI?.subbedInFor ?? '','',0,isPlayerStarting(matchupPosition));
                                           
       syncedMatchupData.homePlayers.push(homePlayerData);
       syncedMatchupData.awayPlayers.push(awayPlayerData);
@@ -186,7 +186,7 @@ const getEspn = async (req: NextApiRequest, res: NextApiResponse) => {
   syncedMatchupData = swapOutTestData(syncedMatchupData, input);
 
   const matchupData = updateMatchupData(syncedMatchupData);
-  console.log('matchupdata', matchupData);
+  // console.log('matchupdata', matchupData);
   console.log('player counts espn ', matchupData.awayPlayers.length + ' ' + matchupData.homePlayers.length)
   // console.log('MATCHUPDATA: ', JSON.stringify(matchupData));
   // await saveCookies(page, 'espn');

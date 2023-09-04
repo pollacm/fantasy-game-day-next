@@ -25,45 +25,45 @@ function Matchup(props: MatchupProps) {
       setAwayFilteredPlayers(mappedData);
     }, [props.matchupData.awayPlayers])
     
-   const getAvailableSubPositions = (position: string) => {
-      let availablePositions = [];
-      const positionSplit = position.split(',');
-      if(position === "QB"){
+   const getAvailableSubPositions = (matchupPosition: string) => {
+      let availablePositions = [];      
+
+      if(matchupPosition === "QB"){
          availablePositions.push("QB");
       }
-      if(position === "RB" ){
+      if(matchupPosition === "RB" ){
          availablePositions.push("RB");
       }
-      if(position === "WR" ){
+      if(matchupPosition === "WR" ){
          availablePositions.push("WR");
       }
-      if(position === "TE" ){
+      if(matchupPosition === "TE" ){
          availablePositions.push("TE");
       }
-      if(position === "W/R/T" ){
+      if(matchupPosition === "W/R/T" ){         
          availablePositions.push("TE");
          availablePositions.push("WR");
          availablePositions.push("RB");
       }
-      if(position === "K" ){
+      if(matchupPosition === "K" ){
          availablePositions.push("K");
       }
-      if(position === "D" ){
+      if(matchupPosition === "D" ){
          availablePositions.push("LB");
          availablePositions.push("DT");
          availablePositions.push("DE");
          availablePositions.push("DL");
          availablePositions.push("DB");
       }
-      if(position === "DB" ){
+      if(matchupPosition === "DB" ){
          availablePositions.push("DB");
       }
-      if(position === "DL" ){
+      if(matchupPosition === "DL" ){
          availablePositions.push("DT");
          availablePositions.push("DE");
          availablePositions.push("DL");
       }
-      if(position === "LB" ){
+      if(matchupPosition === "LB" ){
          availablePositions.push("LB");
       }
 
@@ -174,7 +174,7 @@ function Matchup(props: MatchupProps) {
             {props.subsEnabled && homeFilteredPlayers && homeFilteredPlayers.filter(p => p.isStarter)
             .sort((n1:PlayerData, n2:PlayerData) => n1.order < n2.order ? -1 : 1).map((p, index) => ( 
                <>                                          
-               <p>{p.playerName}</p>
+               <p>{p.playerName !== '' ? p.playerName + ": " + p.matchupPosition : p.matchupPosition}</p>
                <select
                   className="select-button"     
                   value={p.subbedOutFor}
@@ -182,7 +182,7 @@ function Matchup(props: MatchupProps) {
                   {p.subbedOutFor ? <><option selected>{p.subbedOutFor}</option> <option></option></> : <option></option>}
                   
                   {homeFilteredPlayers && homeFilteredPlayers.filter(b => !b.isStarter  && b.playerName !== "BENCH" && 
-                                                      getAvailableSubPositions(p.playerPosition).includes(b.playerPosition) && 
+                                                      getAvailableSubPositions(p.matchupPosition).includes(b.playerPosition) && 
                                                       !homePlayersToSub.some(a => a === b.playerName)).map((b, index) =>
                   <option key={index} value={b.playerName}>{b.playerName}</option>
                   )};
@@ -194,7 +194,7 @@ function Matchup(props: MatchupProps) {
             {props.subsEnabled && awayFilteredPlayers && awayFilteredPlayers.filter(p => p.isStarter)
             .sort((n1:PlayerData, n2:PlayerData) => n1.order < n2.order ? -1 : 1).map((p, index) => ( 
                <>                                          
-               <p>{p.playerName}</p>
+               <p>{p.playerName !== '' ? p.playerName + ": " + p.matchupPosition : p.matchupPosition}</p>
                <select
                   className="select-button"     
                   value={p.subbedOutFor}
@@ -202,7 +202,7 @@ function Matchup(props: MatchupProps) {
                   {p.subbedOutFor ? <><option selected>{p.subbedOutFor}</option> <option></option></> : <option></option>}
                   
                   {awayFilteredPlayers && awayFilteredPlayers.filter(b => !b.isStarter  && b.playerName !== "BENCH" && 
-                                                      getAvailableSubPositions(p.playerPosition).includes(b.playerPosition) && 
+                                                      getAvailableSubPositions(p.matchupPosition).includes(b.playerPosition) && 
                                                       !awayPlayersToSub.some(a => a === b.playerName)).map((b, index) =>
                   <option key={index} value={b.playerName}>{b.playerName}</option>
                   )};
