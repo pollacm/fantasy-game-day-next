@@ -11,7 +11,7 @@ interface MatchupProps {league: string, matchupData:MatchupData, subsEnabled: bo
 
 function Matchup(props: MatchupProps) {
    const [filteredPlayers, setFilteredPlayers] = useState<PlayerData[]>()
-   const [playersToSub, setPlayersToSub] = useState([''])
+   const [playersToSub, setPlayersToSub] = useState<string[]>([])
 
    useEffect(() => {
       const mappedData = props.matchupData.homePlayers.map(item => {return item});
@@ -99,22 +99,49 @@ function Matchup(props: MatchupProps) {
 
    const setPlayerSubsByName = (playerSubbedInFor:string, playerSubbedOutFor:string, homePlayers: boolean) =>
    {      
+      
       if(homePlayers && filteredPlayers){
-         let swappedPlayers = filteredPlayers.map(p => {
-            if(p.playerName === playerSubbedOutFor){
-               return { ...p, subbedOutFor: playerSubbedInFor };
-            }
-            if(p.playerName === playerSubbedInFor){
-               return { ...p, subbedInFor: playerSubbedOutFor };
-            }            
-            return p;      
-         });
-
-         let subIn = filteredPlayers.filter(p => p.playerName === playerSubbedOutFor)[0];
-         let subOut = filteredPlayers.filter(p => p.playerName === playerSubbedInFor)[0];
          
-         [swappedPlayers[subIn.order], swappedPlayers[subOut.order]] = [swappedPlayers[subOut.order], swappedPlayers[subIn.order]];
-         setFilteredPlayers([...swappedPlayers]);
+         let swappedPlayers;
+         if(playerSubbedInFor === '')
+         {            
+            let subbedOutPlayer = filteredPlayers.filter(p => p.playerName === playerSubbedOutFor)[0];
+            let subbedInPlayer = filteredPlayers.filter(p => p.playerName === subbedOutPlayer.subbedOutFor)[0];
+            let subbedInForPlayerName = subbedOutPlayer.subbedOutFor;
+
+            setPlayersToSub(playersToSub.filter(p => p !== subbedOutPlayer.subbedOutFor));
+
+            swappedPlayers = filteredPlayers.map(p => {
+               if(p.playerName === playerSubbedOutFor){                        
+                  return { ...p, subbedOutFor: '' };
+               }
+               if(p.playerName === subbedInForPlayerName){
+                  return { ...p, subbedInFor: '' };
+               }            
+               return p;      
+            });    
+            
+            [swappedPlayers[subbedOutPlayer.order], swappedPlayers[subbedInPlayer.order]] = [swappedPlayers[subbedInPlayer.order], swappedPlayers[subbedOutPlayer.order]];    
+         }
+         else{
+            let subbedOutPlayer = filteredPlayers.filter(p => p.playerName === playerSubbedOutFor)[0];
+            let subbedInPlayer = filteredPlayers.filter(p => p.playerName === playerSubbedInFor)[0];
+
+            swappedPlayers = filteredPlayers.map(p => {
+               if(p.playerName === playerSubbedOutFor){
+                  setPlayersToSub([...playersToSub, playerSubbedInFor]);
+                  return { ...p, subbedOutFor: playerSubbedInFor };
+               }
+               if(p.playerName === playerSubbedInFor){
+                  return { ...p, subbedInFor: playerSubbedOutFor };
+               }            
+               return p;      
+            });         
+            
+            [swappedPlayers[subbedOutPlayer.order], swappedPlayers[subbedInPlayer.order]] = [swappedPlayers[subbedInPlayer.order], swappedPlayers[subbedOutPlayer.order]];            
+         }
+         
+         setFilteredPlayers([...swappedPlayers]);         
       }      
       
       return;
@@ -164,11 +191,15 @@ function Matchup(props: MatchupProps) {
             <p>{p.playerName}</p>
             <select
                className="select-button"     
-               
+               value={p.subbedOutFor}
                onChange={(e) => setPlayerSubsByName(e.target.value, p.playerName, true)}>
-               <option></option>
+               {p.subbedOutFor ? <><option selected>{p.subbedOutFor}</option> <option></option></> : <option></option>}
+               
                {filteredPlayers && filteredPlayers.filter(b => !b.isStarter  && b.playerName !== "BENCH" && 
-                                                   getAvailableSubPositions(p.playerPosition).includes(b.playerPosition)).map((b, index) =>
+                                                   getAvailableSubPositions(p.playerPosition).includes(b.playerPosition) && 
+                                                   !playersToSub.some(a => a === b.playerName)).map((b, index) =>
+                                                   
+                                                   // getAvailableSubPositions(p.playerPosition).includes(b.playerPosition)).map((b, index) =>
                                                    
 
                                                    // getAvailableSubPositions(p.playerPosition).includes(b.playerPosition) && 
