@@ -3,6 +3,7 @@
 // import {type NextPage} from 'next'
 import Matchup from '@/components/Matchup/Matchup'
 import { MatchupData } from '@/components/Matchup/MatchupData';
+import { PlayerData } from '@/components/Player/PlayerData';
 import { match } from 'assert';
 import { useState } from 'react';
 
@@ -39,6 +40,30 @@ export default function Home() {
     setEspnMatchupData(matchupData);
     
     console.log(matchupData);
+  }
+
+  const updateEspnData = (playerData: PlayerData[], home: boolean) => {
+    let updatedMatchup = espnMatchupData;
+    if(home){
+      updatedMatchup.homePlayers = playerData;
+    }
+    else{
+      updatedMatchup.awayPlayers = playerData;
+    }
+    
+    setEspnMatchupData(updatedMatchup);
+  }
+
+  const updateYahooData = (playerData: PlayerData[], home: boolean) => {
+    let updatedMatchup = yahooMatchupData;
+    if(home){
+      updatedMatchup.homePlayers = playerData;
+    }
+    else{
+      updatedMatchup.awayPlayers = playerData;
+    }
+    
+    setYahooMatchupData(updatedMatchup);
   }
 
   const getYahooReplacements = async () => {
@@ -82,8 +107,8 @@ export default function Home() {
 
       {downloads && <p className='text-sm'>This package has {downloads} downloads.</p>}
       <div style={{display: 'block'}}>
-        {espnMatchupData && <Matchup league="R.M.L."  matchupData={espnMatchupData} subsEnabled={false} captainsEnabled={false}></Matchup> }
-        {yahooMatchupData && <Matchup league="The Replacements" matchupData={yahooMatchupData} subsEnabled={true} captainsEnabled={true}></Matchup> }        
+        {espnMatchupData && <Matchup league="R.M.L."  matchupData={espnMatchupData} subsEnabled={false} captainsEnabled={false} onChange={updateEspnData}></Matchup> }
+        {yahooMatchupData && <Matchup league="The Replacements" matchupData={yahooMatchupData} subsEnabled={true} captainsEnabled={true} onChange={updateYahooData}></Matchup> }        
         {/* <Matchup league="T.R.L."></Matchup>
         <Matchup league="P.J.V."></Matchup>
         <Matchup league="Soopa Brawl"></Matchup>

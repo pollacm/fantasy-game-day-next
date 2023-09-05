@@ -8,7 +8,7 @@ import { PlayerData } from '../Player/PlayerData';
 import { Match } from '@testing-library/react';
 import { start } from 'repl';
 
-interface MatchupProps {league: string, matchupData:MatchupData, subsEnabled: boolean, captainsEnabled: boolean}
+interface MatchupProps {league: string, matchupData:MatchupData, subsEnabled: boolean, captainsEnabled: boolean, onChange:any }
 
 function Matchup(props: MatchupProps) {
    const [homeFilteredPlayers, setHomeFilteredPlayers] = useState<PlayerData[]>()
@@ -21,14 +21,15 @@ function Matchup(props: MatchupProps) {
    const [awayTotalPoints, setAwayTotalPoints] = useState(0)
 
    useEffect(() => {
-      let mappedData = props.matchupData.homePlayers.map(item => {return item});
+      let mappedData = props.matchupData.homePlayers.sort((n1:PlayerData, n2:PlayerData) => n1.subOrder < n2.subOrder ? -1 : 1).map(item => {return item});
       // mappedData = [...subAllPlayers(mappedData, true)];
       
       setHomeFilteredPlayers(mappedData);
+
     }, [props.matchupData.homePlayers])
 
     useEffect(() => {
-      const mappedData = props.matchupData.awayPlayers.map(item => {return item});
+      const mappedData = props.matchupData.awayPlayers.sort((n1:PlayerData, n2:PlayerData) => n1.subOrder < n2.subOrder ? -1 : 1).map(item => {return item});
       setAwayFilteredPlayers(mappedData);
     }, [props.matchupData.awayPlayers])
     
@@ -129,20 +130,14 @@ function Matchup(props: MatchupProps) {
    }
 
    const subAllPlayers = (players: PlayerData[], home: boolean) => {
-      let mappedPlayers: PlayerData[] = [];
+      let mappedPlayers: PlayerData[] = players;
 
       if(players && players.length > 0){
          if(home){
-            homeSubs.forEach(homeSub => {
-               let splitHomeSub = homeSub.split("::");
-               mappedPlayers = [...setPlayerSubsByName(splitHomeSub[0], splitHomeSub[1], false, players)]
-            }); 
+            mappedPlayers = setPlayerSubsByName('', '', false, players);
          }
          else{
-            awaySubs.forEach(homeSub => {
-               let splitHomeSub = homeSub.split("::");
-               mappedPlayers = [...setPlayerSubsByName(splitHomeSub[0], splitHomeSub[1], false, players)]
-            });          
+            mappedPlayers = setPlayerSubsByName('', '', false, players);
          }
       }
       return mappedPlayers;
@@ -151,23 +146,7 @@ function Matchup(props: MatchupProps) {
    const setPlayerSubsByName = (playerSubbedInFor:string, playerSubbedOutFor:string, homePlayers: boolean, playerData: PlayerData[]) =>
    {   
       let swappedPlayers: PlayerData[] = [];
-      if(playerData && playerData.length > 0)
-      {
-         let subbedOutPlayer = playerData.filter(p => p.playerName === playerSubbedOutFor)[0];
-         let subbedInPlayer = playerData.filter(p => p.playerName === playerSubbedInFor)[0];
-
-         swappedPlayers = playerData.map(p => {
-            if(p.playerName === playerSubbedOutFor){               
-               return { ...p, subbedOutFor: playerSubbedInFor, subPoints: calculateSubPoints(subbedOutPlayer, subbedInPlayer, true) };
-            }
-            if(p.playerName === playerSubbedInFor){
-               return { ...p, subbedInFor: playerSubbedOutFor, subPoints: 0 };
-            }            
-            return p;      
-         });         
-         
-         [swappedPlayers[subbedOutPlayer.order], swappedPlayers[subbedInPlayer.order]] = [swappedPlayers[subbedInPlayer.order], swappedPlayers[subbedOutPlayer.order]];  
-      }
+      
       if(homePlayers && homeFilteredPlayers){         
          if(playerSubbedInFor === '')
          {            
@@ -188,7 +167,7 @@ function Matchup(props: MatchupProps) {
                return p;      
             });    
             
-            [swappedPlayers[subbedOutPlayer.order], swappedPlayers[subbedInPlayer.order]] = [swappedPlayers[subbedInPlayer.order], swappedPlayers[subbedOutPlayer.order]];    
+            [swappedPlayers[subbedOutPlayer.order], swappedPlayers[subbedInPlayer.order]] = [swappedPlayers[subbedInPlayer.order], swappedPlayers[subbedOutPlayer.order]];   
          }
          else{
             let subbedOutPlayer = homeFilteredPlayers.filter(p => p.playerName === playerSubbedOutFor)[0];
@@ -207,10 +186,14 @@ function Matchup(props: MatchupProps) {
                return p;      
             });         
             
-            [swappedPlayers[subbedOutPlayer.order], swappedPlayers[subbedInPlayer.order]] = [swappedPlayers[subbedInPlayer.order], swappedPlayers[subbedOutPlayer.order]];            
+            [swappedPlayers[subbedOutPlayer.order], swappedPlayers[subbedInPlayer.order]] = [swappedPlayers[subbedInPlayer.order], swappedPlayers[subbedOutPlayer.order]];         
          }
+         swappedPlayers = swappedPlayers.map((p, index) => {
+            return { ...p, subOrder:  index};
+         });
          
-         setHomeFilteredPlayers([...swappedPlayers]);         
+         setHomeFilteredPlayers([...swappedPlayers]);
+         props.onChange(swappedPlayers, true);         
       }   
       if(!homePlayers && awayFilteredPlayers){
          
@@ -233,7 +216,7 @@ function Matchup(props: MatchupProps) {
                return p;      
             });    
             
-            [swappedPlayers[subbedOutPlayer.order], swappedPlayers[subbedInPlayer.order]] = [swappedPlayers[subbedInPlayer.order], swappedPlayers[subbedOutPlayer.order]];    
+            [swappedPlayers[subbedOutPlayer.order], swappedPlayers[subbedInPlayer.order]] = [swappedPlayers[subbedInPlayer.order], swappedPlayers[subbedOutPlayer.order]];  
          }
          else{
             let subbedOutPlayer = awayFilteredPlayers.filter(p => p.playerName === playerSubbedOutFor)[0];
@@ -252,10 +235,15 @@ function Matchup(props: MatchupProps) {
                return p;      
             });         
             
-            [swappedPlayers[subbedOutPlayer.order], swappedPlayers[subbedInPlayer.order]] = [swappedPlayers[subbedInPlayer.order], swappedPlayers[subbedOutPlayer.order]];            
+            [swappedPlayers[subbedOutPlayer.order], swappedPlayers[subbedInPlayer.order]] = [swappedPlayers[subbedInPlayer.order], swappedPlayers[subbedOutPlayer.order]];                          
          }
          
-         setAwayFilteredPlayers([...swappedPlayers]);         
+         swappedPlayers = swappedPlayers.map((p, index) => {
+            return { ...p, subOrder:  index};
+         });
+
+         setAwayFilteredPlayers([...swappedPlayers]);  
+         props.onChange(swappedPlayers, false);       
       }   
       
       return swappedPlayers;

@@ -172,15 +172,16 @@ const getEspn = async (req: NextApiRequest, res: NextApiResponse) => {
           awayPlayerFromUILastUpdate = awayPlayerFromUI.playerLastUpdate;
       }
 
-      let homePlayerData = new PlayerData(count, homePlayerFromUIName, homeUpdatedPlayerName,homePlayerPosition,homePlayerFromUIPoints,homeUpdatedPlayerPoints, homePlayerFromUIPointDiff, homePlayerFromUILastUpdate,
+      let homePlayerData = new PlayerData(count, homePlayerFromUI?.subOrder ?? count, homePlayerFromUIName, homeUpdatedPlayerName,homePlayerPosition,homePlayerFromUIPoints,homeUpdatedPlayerPoints, homePlayerFromUIPointDiff, homePlayerFromUILastUpdate,
                                          homePlayerFromUI?.subbedOutFor ?? '', homePlayerFromUI?.subbedInFor ?? '', '',0, isPlayerStarting(matchupPosition));
 
-      let awayPlayerData = new PlayerData(count++, awayPlayerFromUIName, awayUpdatedPlayerName, awayPlayerPosition,awayPlayerFromUIPoints,awayUpdatedPlayerPoints, awayPlayerFromUIPointDiff, awayPlayerFromUILastUpdate,
+      let awayPlayerData = new PlayerData(count, awayPlayerFromUI?.subOrder ?? count, awayPlayerFromUIName, awayUpdatedPlayerName, awayPlayerPosition,awayPlayerFromUIPoints,awayUpdatedPlayerPoints, awayPlayerFromUIPointDiff, awayPlayerFromUILastUpdate,
                                          awayPlayerFromUI?.subbedOutFor ?? '', awayPlayerFromUI?.subbedInFor ?? '','',0,isPlayerStarting(matchupPosition));
                                           
       syncedMatchupData.homePlayers.push(homePlayerData);
       syncedMatchupData.awayPlayers.push(awayPlayerData);
     }
+    count++;
   }
 
   syncedMatchupData = swapOutTestData(syncedMatchupData, input, 'rml');
