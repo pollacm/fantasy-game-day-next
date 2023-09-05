@@ -150,13 +150,13 @@ function Matchup(props: MatchupProps) {
 
    const setPlayerSubsByName = (playerSubbedInFor:string, playerSubbedOutFor:string, homePlayers: boolean, playerData: PlayerData[]) =>
    {   
-      let swappedPlayers: PlayerData[];
+      let swappedPlayers: PlayerData[] = [];
       if(playerData && playerData.length > 0)
       {
          let subbedOutPlayer = playerData.filter(p => p.playerName === playerSubbedOutFor)[0];
          let subbedInPlayer = playerData.filter(p => p.playerName === playerSubbedInFor)[0];
 
-         let swappedPlayers = playerData.map(p => {
+         swappedPlayers = playerData.map(p => {
             if(p.playerName === playerSubbedOutFor){               
                return { ...p, subbedOutFor: playerSubbedInFor, subPoints: calculateSubPoints(subbedOutPlayer, subbedInPlayer, true) };
             }
@@ -214,7 +214,6 @@ function Matchup(props: MatchupProps) {
       }   
       if(!homePlayers && awayFilteredPlayers){
          
-         let swappedPlayers;
          if(playerSubbedInFor === '')
          {            
             let subbedOutPlayer = awayFilteredPlayers.filter(p => p.playerName === playerSubbedOutFor)[0];
