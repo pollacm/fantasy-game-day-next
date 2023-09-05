@@ -44,7 +44,7 @@ export default function Home() {
   const getYahooReplacements = async () => {
     const res = await fetch('http://localhost:3000/api/getYahoo', {
       method: 'POST',
-      body: JSON.stringify({yahooMatchupData, league: '32919', input: ''})
+      body: JSON.stringify({yahooMatchupData, league: '32919', input: input})
     })
     console.log('out of api')
     const { matchupData } = await res.json();

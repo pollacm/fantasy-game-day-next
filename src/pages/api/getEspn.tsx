@@ -16,7 +16,7 @@ const getEspn = async (req: NextApiRequest, res: NextApiResponse) => {
 
     puppeteer.use(StealthPlugin());
 
-    const browser = await puppeteer.launch({headless:"new", executablePath:"C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",  
+    const browser = await puppeteer.launch({headless:false, executablePath:"C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",  
     userDataDir:`${process.env.REACT_APP_DATAL}`
     , args:['--disable-web-security', ' --disable-features=site-per-process']
         });
@@ -183,7 +183,7 @@ const getEspn = async (req: NextApiRequest, res: NextApiResponse) => {
     }
   }
 
-  syncedMatchupData = swapOutTestData(syncedMatchupData, input);
+  syncedMatchupData = swapOutTestData(syncedMatchupData, input, 'rml');
 
   const matchupData = updateMatchupData(syncedMatchupData);
   // console.log('matchupdata', matchupData);

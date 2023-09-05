@@ -170,7 +170,7 @@ const getYahoo = async (req: NextApiRequest, res: NextApiResponse) => {
     syncedMatchupData.awayPlayers.push(awayPlayerData);
   }
 
-  syncedMatchupData = swapOutTestData(syncedMatchupData, input);
+  syncedMatchupData = swapOutTestData(syncedMatchupData, input, 'trl');
 
   const matchupData = updateMatchupData(syncedMatchupData);
   console.log('matchupdata', matchupData);
