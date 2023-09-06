@@ -153,8 +153,8 @@ const getYahoo = async (req: NextApiRequest, res: NextApiResponse) => {
     //add break in first bench position
     if(!isPlayerStarting(matchupPosition) && !firstBench)
     {
-        syncedMatchupData.awayPlayers.push(new PlayerData(count, count, 'BENCH','BENCH','BENCH',0,0,0,'', '','', '', 0,false));
-        syncedMatchupData.homePlayers.push(new PlayerData(count, count, 'BENCH','BENCH','BENCH',0,0,0,'', '','','',0,false));
+        syncedMatchupData.awayPlayers.push(new PlayerData(count, count, 'BENCH','BENCH','BENCH',0,0,0,'', '','', '', 0,0,false));
+        syncedMatchupData.homePlayers.push(new PlayerData(count, count, 'BENCH','BENCH','BENCH',0,0,0,'', '','','',0,0,false));
         count++;
         
         firstBench = true;        
@@ -164,9 +164,9 @@ const getYahoo = async (req: NextApiRequest, res: NextApiResponse) => {
       continue;
     }
     let homePlayerData = new PlayerData(count, homePlayerFromUI?.subOrder ?? count, homePlayerFromUIName, homeUpdatedPlayerName,homePlayerPosition,homePlayerFromUIPoints,homeUpdatedPlayerPoints, homePlayerFromUIPointDiff, homePlayerFromUILastUpdate,
-        homePlayerFromUI?.subbedOutFor ?? '', homePlayerFromUI?.subbedInFor ?? '', matchupPosition, homePlayerFromUI?.subPoints ?? 0, isPlayerStarting(matchupPosition));
+        homePlayerFromUI?.subbedOutFor ?? '', homePlayerFromUI?.subbedInFor ?? '', matchupPosition, homePlayerFromUI?.subPoints ?? 0, homePlayerFromUI?.captainPoints ?? 0,isPlayerStarting(matchupPosition));
     let awayPlayerData = new PlayerData(count, awayPlayerFromUI?.subOrder ?? count, awayPlayerFromUIName, awayUpdatedPlayerName, awayPlayerPosition,awayPlayerFromUIPoints,awayUpdatedPlayerPoints, awayPlayerFromUIPointDiff, awayPlayerFromUILastUpdate,
-        awayPlayerFromUI?.subbedOutFor ?? '', awayPlayerFromUI?.subbedInFor ?? '', matchupPosition, awayPlayerFromUI?.subPoints ?? 0,isPlayerStarting(matchupPosition));
+        awayPlayerFromUI?.subbedOutFor ?? '', awayPlayerFromUI?.subbedInFor ?? '', matchupPosition, awayPlayerFromUI?.subPoints ?? 0, awayPlayerFromUI?.captainPoints ?? 0,isPlayerStarting(matchupPosition));
 
     syncedMatchupData.homePlayers.push(homePlayerData);
     syncedMatchupData.awayPlayers.push(awayPlayerData);

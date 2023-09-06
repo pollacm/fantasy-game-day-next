@@ -14,9 +14,11 @@ function Matchup(props: MatchupProps) {
    const [homeFilteredPlayers, setHomeFilteredPlayers] = useState<PlayerData[]>([])
    const [homePlayersToSub, setHomePlayersToSub] = useState<string[]>([])
    const [homeSubs, setHomeSubs] = useState<string[]>([])
+   const [homeCaptain, setHomeCaptain] = useState<string>('')
    const [homeTotalPoints, setHomeTotalPoints] = useState(0)
    const [awayFilteredPlayers, setAwayFilteredPlayers] = useState<PlayerData[]>([])
    const [awaySubs, setAwaySubs] = useState<string[]>([])
+   const [awayCaptain, setAwayCaptain] = useState<string>('')
    const [awayPlayersToSub, setAwayPlayersToSub] = useState<string[]>([])
    const [awayTotalPoints, setAwayTotalPoints] = useState(0)
 
@@ -30,12 +32,41 @@ function Matchup(props: MatchupProps) {
 
     useEffect(() => {
       let mappedData = props.matchupData.awayPlayers.sort((n1:PlayerData, n2:PlayerData) => n1.subOrder < n2.subOrder ? -1 : 1).map(item => {return item});
+      
       mappedData = subAllPlayers(mappedData, false);      
 
       setAwayFilteredPlayers(mappedData);
       
     }, [props.matchupData.homePlayers])
     
+    useEffect(() => {
+      //implement captain calculation in here
+      var orderedPlayers = homeFilteredPlayers.sort((n1:PlayerData, n2:PlayerData) => n1.subOrder < n2.subOrder ? -1 : 1).map((p, index) => {return p});
+      let mappedPlayers = subAllPlayers(orderedPlayers, true);
+      
+      setHomeFilteredPlayers([...mappedPlayers]);
+      props.onChange(mappedPlayers, true);
+    }, [homeCaptain])
+
+    useEffect(() => {
+      //implement captain calculation in here
+      var orderedPlayers = awayFilteredPlayers.sort((n1:PlayerData, n2:PlayerData) => n1.subOrder < n2.subOrder ? -1 : 1).map((p, index) => {return p});
+      let mappedPlayers = subAllPlayers(orderedPlayers, false);
+      
+      setAwayFilteredPlayers([...mappedPlayers]);
+      props.onChange(mappedPlayers, false);
+
+    }, [awayCaptain])
+
+    const setCaptainAndUpdatePoints = (captain: string, homeTeam: boolean) => {
+         if(homeTeam){
+            setHomeCaptain(captain);
+         }
+         else{
+            setAwayCaptain(captain);
+         }
+    }
+
    const getAvailableSubPositions = (matchupPosition: string) => {
       let availablePositions = [];      
 
@@ -98,8 +129,9 @@ function Matchup(props: MatchupProps) {
       {
          fullSub = true;
       }
-
-      return fullSub ? bench.playerPoints : (starter.playerPoints + bench.playerPoints) / 2;
+      let starterPoints = starter.captainPoints !== 0 ? starter.captainPoints : starter.playerPoints;
+      let benchPoints = bench.captainPoints !== 0 ? bench.captainPoints : bench.playerPoints;
+      return fullSub ? benchPoints : (starterPoints + benchPoints) / 2;
    }
 
    const calculateTotalPoints = () => {
@@ -136,12 +168,7 @@ function Matchup(props: MatchupProps) {
       let mappedPlayers: PlayerData[] = players;
 
       if(players && players.length > 0){
-         if(home){
-            mappedPlayers = setPlayerSubsByName('', '', false, players);
-         }
-         else{
-            mappedPlayers = setPlayerSubsByName('', '', false, players);
-         }
+         mappedPlayers = setPlayerSubsByName('', '', home, players);
       }
       return mappedPlayers;
    }
@@ -152,14 +179,30 @@ function Matchup(props: MatchupProps) {
       
       if(playerData && playerData.length > 0){         
             swappedPlayers = playerData.map(player => {               
+               let captain;
+               if(homePlayers){
+                  captain = playerData.filter(p => p.playerName === homeCaptain);
+               }
+               else{
+                  captain = playerData.filter(p => p.playerName === awayCaptain);
+               }
+
+               if(captain && captain.length === 1 && player.playerName === captain[0].playerName){
+                  return { ...player, captainPoints: player.playerPoints * 1.5 };
+               }
+               else{
+                  return { ...player, captainPoints: 0 };
+               }
+            });
+            
+            swappedPlayers = swappedPlayers.map(player => {               
                
-               if(player.isStarter && player.subbedOutFor){
-                  let subbedInPlayer = playerData.filter(p => p.playerName === player.subbedOutFor)[0];                     
-                  return { ...player, subPoints: calculateSubPoints(player, subbedInPlayer, true) };
+               if(player.isStarter){                    
+                  return { ...player, subPoints: 0 };
                }
                else if(!player.isStarter && player.subbedInFor){
-                  let subbedOutPlayer = playerData.filter(p => p.playerName === player.subbedInFor)[0];                     
-                  return { ...player, subPoints: calculateSubPoints(subbedOutPlayer, player, true) };
+                  let subbedOutPlayer = swappedPlayers.filter(p => p.playerName === player.subbedInFor)[0];                     
+                  return { ...player, subPoints: calculateSubPoints(subbedOutPlayer, player, homePlayers) };
                }
                else{
                   return player;
@@ -241,7 +284,7 @@ function Matchup(props: MatchupProps) {
                   return p;      
                });    
                
-               [swappedPlayers[subbedOutPlayer.order], swappedPlayers[subbedInPlayer.order]] = [swappedPlayers[subbedInPlayer.order], swappedPlayers[subbedOutPlayer.order]];  
+               // [swappedPlayers[subbedOutPlayer.order], swappedPlayers[subbedInPlayer.order]] = [swappedPlayers[subbedInPlayer.order], swappedPlayers[subbedOutPlayer.order]];  
             }
             else{
                let subbedOutPlayer = awayFilteredPlayers.filter(p => p.playerName === playerSubbedOutFor)[0];
@@ -278,14 +321,48 @@ function Matchup(props: MatchupProps) {
    return (<MatchupWrapper data-testid="Matchup">        
       <h1>{props.league}</h1>
       <div className='team-container'>        
-         {homeFilteredPlayers && awayFilteredPlayers && homeFilteredPlayers.map((p, index) => ( 
+         {homeFilteredPlayers && awayFilteredPlayers && homeFilteredPlayers.sort((n1:PlayerData, n2:PlayerData) => n1.subOrder < n2.subOrder ? -1 : 1).map((p, index) => ( 
          <Team key={index} 
          homePlayerName={p.playerName} homePlayerPosition={p.playerPosition} homePlayerPoints={p.playerPoints} 
-         homePlayerSubPoints={p.subPoints} homePlayerSubbedInFor={p.subbedInFor} homePlayerSubbedOutFor={p.subbedOutFor} 
+         homePlayerSubPoints={p.subPoints} homePlayerCaptainPoints={p.captainPoints} homePlayerSubbedInFor={p.subbedInFor} homePlayerSubbedOutFor={p.subbedOutFor} 
 
          awayPlayerName={awayFilteredPlayers[index].playerName} awayPlayerPosition={awayFilteredPlayers[index].playerPosition} awayPlayerPoints={awayFilteredPlayers[index].playerPoints} 
-         awayPlayerSubPoints={awayFilteredPlayers[index].subPoints} awayPlayerSubbedInFor={awayFilteredPlayers[index].subbedInFor} awayPlayerSubbedOutFor={awayFilteredPlayers[index].subbedOutFor}></Team>))}
+         awayPlayerSubPoints={awayFilteredPlayers[index].subPoints} awayPlayerCaptainPoints={awayFilteredPlayers[index].captainPoints} awayPlayerSubbedInFor={awayFilteredPlayers[index].subbedInFor} awayPlayerSubbedOutFor={awayFilteredPlayers[index].subbedOutFor}></Team>))}
          {/* {props.matchupData && props.matchupData.homePlayers && props.matchupData.homePlayers.map((p, index) => ( <Team key={index} homePlayer={p} awayPlayer={props.matchupData.awayPlayers[index]}></Team>))} */}
+         
+         {props.captainsEnabled && homeFilteredPlayers && homeFilteredPlayers.length > 0 &&
+         <div style={{width: '50%'}}>                
+               <p>Select Captain</p>
+               <select
+                  className="select-button"     
+                  value={homeCaptain}
+                  onChange={(e) => setCaptainAndUpdatePoints(e.target.value, true)}>
+                  <option></option>
+                  
+                  {homeFilteredPlayers.sort((n1:PlayerData, n2:PlayerData) => n1.order < n2.order ? -1 : 1).map((p, index) => (
+                     <option key={index} value={p.playerName}>{p.playerName}</option>
+                  ))};
+                  
+               </select>            
+         </div>
+         } 
+         {props.captainsEnabled && awayFilteredPlayers && awayFilteredPlayers.length > 0 &&
+         <div style={{width: '50%'}}>                
+               <p>Select Captain</p>
+               <select
+                  className="select-button"     
+                  value={awayCaptain}
+                  onChange={(e) => setCaptainAndUpdatePoints(e.target.value, false)}>
+                  <option></option>
+                  
+                  {awayFilteredPlayers.sort((n1:PlayerData, n2:PlayerData) => n1.order < n2.order ? -1 : 1).map((p, index) => (
+                     <option key={index} value={p.playerName}>{p.playerName}</option>
+                  ))};
+                  
+               </select>            
+         </div>
+         }
+         
          <div style={{width: '50%'}}>         
             {props.subsEnabled && homeFilteredPlayers && homeFilteredPlayers.filter(p => p.isStarter)
             .sort((n1:PlayerData, n2:PlayerData) => n1.order < n2.order ? -1 : 1).map((p, index) => ( 
@@ -305,7 +382,8 @@ function Matchup(props: MatchupProps) {
                </select>
             </>
             ))}
-         </div> 
+         </div>
+         
          <div style={{width: '50%'}}>         
             {props.subsEnabled && awayFilteredPlayers && awayFilteredPlayers.filter(p => p.isStarter)
             .sort((n1:PlayerData, n2:PlayerData) => n1.order < n2.order ? -1 : 1).map((p, index) => ( 
@@ -325,7 +403,8 @@ function Matchup(props: MatchupProps) {
                </select>
             </>
             ))}
-         </div>         
+         </div> 
+
       </div>
       
       </MatchupWrapper> )
