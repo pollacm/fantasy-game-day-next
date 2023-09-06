@@ -11,27 +11,30 @@ import { start } from 'repl';
 interface MatchupProps {league: string, matchupData:MatchupData, subsEnabled: boolean, captainsEnabled: boolean, onChange:any }
 
 function Matchup(props: MatchupProps) {
-   const [homeFilteredPlayers, setHomeFilteredPlayers] = useState<PlayerData[]>()
+   const [homeFilteredPlayers, setHomeFilteredPlayers] = useState<PlayerData[]>([])
    const [homePlayersToSub, setHomePlayersToSub] = useState<string[]>([])
    const [homeSubs, setHomeSubs] = useState<string[]>([])
    const [homeTotalPoints, setHomeTotalPoints] = useState(0)
-   const [awayFilteredPlayers, setAwayFilteredPlayers] = useState<PlayerData[]>()
+   const [awayFilteredPlayers, setAwayFilteredPlayers] = useState<PlayerData[]>([])
    const [awaySubs, setAwaySubs] = useState<string[]>([])
    const [awayPlayersToSub, setAwayPlayersToSub] = useState<string[]>([])
    const [awayTotalPoints, setAwayTotalPoints] = useState(0)
 
    useEffect(() => {
       let mappedData = props.matchupData.homePlayers.sort((n1:PlayerData, n2:PlayerData) => n1.subOrder < n2.subOrder ? -1 : 1).map(item => {return item});
-      // mappedData = [...subAllPlayers(mappedData, true)];
-      
+      mappedData = subAllPlayers(mappedData, true);      
+
       setHomeFilteredPlayers(mappedData);
 
     }, [props.matchupData.homePlayers])
 
     useEffect(() => {
-      const mappedData = props.matchupData.awayPlayers.sort((n1:PlayerData, n2:PlayerData) => n1.subOrder < n2.subOrder ? -1 : 1).map(item => {return item});
+      let mappedData = props.matchupData.awayPlayers.sort((n1:PlayerData, n2:PlayerData) => n1.subOrder < n2.subOrder ? -1 : 1).map(item => {return item});
+      mappedData = subAllPlayers(mappedData, false);      
+
       setAwayFilteredPlayers(mappedData);
-    }, [props.matchupData.awayPlayers])
+      
+    }, [props.matchupData.homePlayers])
     
    const getAvailableSubPositions = (matchupPosition: string) => {
       let availablePositions = [];      
@@ -147,104 +150,127 @@ function Matchup(props: MatchupProps) {
    {   
       let swappedPlayers: PlayerData[] = [];
       
-      if(homePlayers && homeFilteredPlayers){         
-         if(playerSubbedInFor === '')
-         {            
-            let subbedOutPlayer = homeFilteredPlayers.filter(p => p.playerName === playerSubbedOutFor)[0];
-            let subbedInPlayer = homeFilteredPlayers.filter(p => p.playerName === subbedOutPlayer.subbedOutFor)[0];
-            let subbedInForPlayerName = subbedOutPlayer.subbedOutFor;
-
-            setHomePlayersToSub(homePlayersToSub.filter(p => p !== subbedOutPlayer.subbedOutFor));
-            setHomeSubs(homeSubs.filter(s => s !== `${subbedInPlayer.playerName}::${playerSubbedOutFor}`))
-
-            swappedPlayers = homeFilteredPlayers.map(p => {
-               if(p.playerName === playerSubbedOutFor){                        
-                  return { ...p, subbedOutFor: '', subPoints: 0 };
+      if(playerData && playerData.length > 0){         
+            swappedPlayers = playerData.map(player => {               
+               
+               if(player.isStarter && player.subbedOutFor){
+                  let subbedInPlayer = playerData.filter(p => p.playerName === player.subbedOutFor)[0];                     
+                  return { ...player, subPoints: calculateSubPoints(player, subbedInPlayer, true) };
                }
-               if(p.playerName === subbedInForPlayerName){
-                  return { ...p, subbedInFor: '', subPoints: 0 };
-               }            
-               return p;      
-            });    
-            
-            [swappedPlayers[subbedOutPlayer.order], swappedPlayers[subbedInPlayer.order]] = [swappedPlayers[subbedInPlayer.order], swappedPlayers[subbedOutPlayer.order]];   
-         }
-         else{
-            let subbedOutPlayer = homeFilteredPlayers.filter(p => p.playerName === playerSubbedOutFor)[0];
-            let subbedInPlayer = homeFilteredPlayers.filter(p => p.playerName === playerSubbedInFor)[0];
-
-            swappedPlayers = homeFilteredPlayers.map(p => {
-               if(p.playerName === playerSubbedOutFor){
-                  setHomePlayersToSub([...homePlayersToSub, playerSubbedInFor]);
-                  setHomeSubs([...homeSubs, `${playerSubbedInFor}::${playerSubbedOutFor}`])
-
-                  return { ...p, subbedOutFor: playerSubbedInFor, subPoints: 0 };
+               else if(!player.isStarter && player.subbedInFor){
+                  let subbedOutPlayer = playerData.filter(p => p.playerName === player.subbedInFor)[0];                     
+                  return { ...player, subPoints: calculateSubPoints(subbedOutPlayer, player, true) };
                }
-               if(p.playerName === playerSubbedInFor){
-                  return { ...p, subbedInFor: playerSubbedOutFor, subPoints: calculateSubPoints(subbedOutPlayer, subbedInPlayer, true) };
-               }            
-               return p;      
+               else{
+                  return player;
+               }
             });         
+
+            swappedPlayers = swappedPlayers.map((p, index) => {
+               return { ...p, subOrder:  index};
+            });   
+      }  
+      else
+      {
+         if(homePlayers && homeFilteredPlayers){         
+            if(playerSubbedInFor === '')
+            {            
+               let subbedOutPlayer = homeFilteredPlayers.filter(p => p.playerName === playerSubbedOutFor)[0];
+               let subbedInPlayer = homeFilteredPlayers.filter(p => p.playerName === subbedOutPlayer.subbedOutFor)[0];
+               let subbedInForPlayerName = subbedOutPlayer.subbedOutFor;
+   
+               setHomePlayersToSub(homePlayersToSub.filter(p => p !== subbedOutPlayer.subbedOutFor));
+               setHomeSubs(homeSubs.filter(s => s !== `${subbedInPlayer.playerName}::${playerSubbedOutFor}`))
+   
+               swappedPlayers = homeFilteredPlayers.map(p => {
+                  if(p.playerName === playerSubbedOutFor){                        
+                     return { ...p, subbedOutFor: '', subPoints: 0 };
+                  }
+                  if(p.playerName === subbedInForPlayerName){
+                     return { ...p, subbedInFor: '', subPoints: 0 };
+                  }            
+                  return p;      
+               });    
+               
+               [swappedPlayers[subbedOutPlayer.order], swappedPlayers[subbedInPlayer.order]] = [swappedPlayers[subbedInPlayer.order], swappedPlayers[subbedOutPlayer.order]];   
+            }
+            else{
+               let subbedOutPlayer = homeFilteredPlayers.filter(p => p.playerName === playerSubbedOutFor)[0];
+               let subbedInPlayer = homeFilteredPlayers.filter(p => p.playerName === playerSubbedInFor)[0];
+   
+               swappedPlayers = homeFilteredPlayers.map(p => {
+                  if(p.playerName === playerSubbedOutFor){
+                     setHomePlayersToSub([...homePlayersToSub, playerSubbedInFor]);
+                     setHomeSubs([...homeSubs, `${playerSubbedInFor}::${playerSubbedOutFor}`])
+   
+                     return { ...p, subbedOutFor: playerSubbedInFor, subPoints: 0 };
+                  }
+                  if(p.playerName === playerSubbedInFor){
+                     return { ...p, subbedInFor: playerSubbedOutFor, subPoints: calculateSubPoints(subbedOutPlayer, subbedInPlayer, true) };
+                  }            
+                  return p;      
+               });         
+               
+               [swappedPlayers[subbedOutPlayer.order], swappedPlayers[subbedInPlayer.order]] = [swappedPlayers[subbedInPlayer.order], swappedPlayers[subbedOutPlayer.order]];         
+            }
+            swappedPlayers = swappedPlayers.map((p, index) => {
+               return { ...p, subOrder:  index};
+            });
             
-            [swappedPlayers[subbedOutPlayer.order], swappedPlayers[subbedInPlayer.order]] = [swappedPlayers[subbedInPlayer.order], swappedPlayers[subbedOutPlayer.order]];         
-         }
-         swappedPlayers = swappedPlayers.map((p, index) => {
-            return { ...p, subOrder:  index};
-         });
-         
-         setHomeFilteredPlayers([...swappedPlayers]);
-         props.onChange(swappedPlayers, true);         
-      }   
-      if(!homePlayers && awayFilteredPlayers){
-         
-         if(playerSubbedInFor === '')
-         {            
-            let subbedOutPlayer = awayFilteredPlayers.filter(p => p.playerName === playerSubbedOutFor)[0];
-            let subbedInPlayer = awayFilteredPlayers.filter(p => p.playerName === subbedOutPlayer.subbedOutFor)[0];
-            let subbedInForPlayerName = subbedOutPlayer.subbedOutFor;
-
-            setAwayPlayersToSub(awayPlayersToSub.filter(p => p !== subbedOutPlayer.subbedOutFor));
-            setAwaySubs(awaySubs.filter(s => s !== `${subbedInPlayer.playerName}::${playerSubbedOutFor}`))            
-
-            swappedPlayers = awayFilteredPlayers.map(p => {
-               if(p.playerName === playerSubbedOutFor){                        
-                  return { ...p, subbedOutFor: '', subPoints: 0 };
-               }
-               if(p.playerName === subbedInForPlayerName){
-                  return { ...p, subbedInFor: '', subPoints: 0 };
-               }            
-               return p;      
-            });    
+            setHomeFilteredPlayers([...swappedPlayers]);
+            props.onChange(swappedPlayers, true);         
+         }   
+         if(!homePlayers && awayFilteredPlayers){
             
-            [swappedPlayers[subbedOutPlayer.order], swappedPlayers[subbedInPlayer.order]] = [swappedPlayers[subbedInPlayer.order], swappedPlayers[subbedOutPlayer.order]];  
-         }
-         else{
-            let subbedOutPlayer = awayFilteredPlayers.filter(p => p.playerName === playerSubbedOutFor)[0];
-            let subbedInPlayer = awayFilteredPlayers.filter(p => p.playerName === playerSubbedInFor)[0];
-
-            swappedPlayers = awayFilteredPlayers.map(p => {
-               if(p.playerName === playerSubbedOutFor){
-                  setAwayPlayersToSub([...awayPlayersToSub, playerSubbedInFor]);
-                  setAwaySubs([...awaySubs, `${playerSubbedInFor}::${playerSubbedOutFor}`])
-
-                  return { ...p, subbedOutFor: playerSubbedInFor, subPoints: 0 };
-               }
-               if(p.playerName === playerSubbedInFor){
-                  return { ...p, subbedInFor: playerSubbedOutFor, subPoints: calculateSubPoints(subbedOutPlayer, subbedInPlayer, false) };
-               }            
-               return p;      
-            });         
+            if(playerSubbedInFor === '')
+            {            
+               let subbedOutPlayer = awayFilteredPlayers.filter(p => p.playerName === playerSubbedOutFor)[0];
+               let subbedInPlayer = awayFilteredPlayers.filter(p => p.playerName === subbedOutPlayer.subbedOutFor)[0];
+               let subbedInForPlayerName = subbedOutPlayer.subbedOutFor;
+   
+               setAwayPlayersToSub(awayPlayersToSub.filter(p => p !== subbedOutPlayer.subbedOutFor));
+               setAwaySubs(awaySubs.filter(s => s !== `${subbedInPlayer.playerName}::${playerSubbedOutFor}`))            
+   
+               swappedPlayers = awayFilteredPlayers.map(p => {
+                  if(p.playerName === playerSubbedOutFor){                        
+                     return { ...p, subbedOutFor: '', subPoints: 0 };
+                  }
+                  if(p.playerName === subbedInForPlayerName){
+                     return { ...p, subbedInFor: '', subPoints: 0 };
+                  }            
+                  return p;      
+               });    
+               
+               [swappedPlayers[subbedOutPlayer.order], swappedPlayers[subbedInPlayer.order]] = [swappedPlayers[subbedInPlayer.order], swappedPlayers[subbedOutPlayer.order]];  
+            }
+            else{
+               let subbedOutPlayer = awayFilteredPlayers.filter(p => p.playerName === playerSubbedOutFor)[0];
+               let subbedInPlayer = awayFilteredPlayers.filter(p => p.playerName === playerSubbedInFor)[0];
+   
+               swappedPlayers = awayFilteredPlayers.map(p => {
+                  if(p.playerName === playerSubbedOutFor){
+                     setAwayPlayersToSub([...awayPlayersToSub, playerSubbedInFor]);
+                     setAwaySubs([...awaySubs, `${playerSubbedInFor}::${playerSubbedOutFor}`])
+   
+                     return { ...p, subbedOutFor: playerSubbedInFor, subPoints: 0 };
+                  }
+                  if(p.playerName === playerSubbedInFor){
+                     return { ...p, subbedInFor: playerSubbedOutFor, subPoints: calculateSubPoints(subbedOutPlayer, subbedInPlayer, false) };
+                  }            
+                  return p;      
+               });         
+               
+               [swappedPlayers[subbedOutPlayer.order], swappedPlayers[subbedInPlayer.order]] = [swappedPlayers[subbedInPlayer.order], swappedPlayers[subbedOutPlayer.order]];                          
+            }
             
-            [swappedPlayers[subbedOutPlayer.order], swappedPlayers[subbedInPlayer.order]] = [swappedPlayers[subbedInPlayer.order], swappedPlayers[subbedOutPlayer.order]];                          
+            swappedPlayers = swappedPlayers.map((p, index) => {
+               return { ...p, subOrder:  index};
+            });
+   
+            setAwayFilteredPlayers([...swappedPlayers]);  
+            props.onChange(swappedPlayers, false);       
          }
-         
-         swappedPlayers = swappedPlayers.map((p, index) => {
-            return { ...p, subOrder:  index};
-         });
-
-         setAwayFilteredPlayers([...swappedPlayers]);  
-         props.onChange(swappedPlayers, false);       
-      }   
+      }         
       
       return swappedPlayers;
    }
