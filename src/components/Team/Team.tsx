@@ -10,7 +10,7 @@ interface TeamProps {homePlayerName: string, homePlayerPosition:string, homePlay
 
 const Team: FC<TeamProps> = ({homePlayerName, homePlayerPosition, homePlayerPoints, homePlayerSubPoints, homePlayerCaptainPoints, homePlayerSubbedInFor, homePlayerSubbedOutFor, 
     awayPlayerName, awayPlayerPosition, awayPlayerPoints, awayPlayerSubPoints, awayPlayerCaptainPoints, awayPlayerSubbedInFor, awayPlayerSubbedOutFor, }) => (
- <TeamWrapper data-testid="Team" style={{  backgroundColor: "red", display: 'inline-block' }}>
+        <div data-testid="Team" className="flex justify-between text-xs">
         
         <Player key="1" playerPosition={homePlayerPosition} 
             playerName={homePlayerName}
@@ -27,7 +27,7 @@ const Team: FC<TeamProps> = ({homePlayerName, homePlayerPosition, homePlayerPoin
             subbedInFor={awayPlayerSubbedInFor}
             subbedOutFor={awayPlayerSubbedOutFor}></Player>
         
- </TeamWrapper>
+ </div>
 );
 
 export default Team;

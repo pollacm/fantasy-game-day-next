@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { MatchupWrapper } from './Matchup.styled';
 import Team from '../Team/Team'
 import { MatchupData } from './MatchupData';
 import { PlayerData } from '../Player/PlayerData';
@@ -359,7 +358,7 @@ function Matchup(props: MatchupProps) {
       return swappedPlayers;
    }
    
-   return (<MatchupWrapper data-testid="Matchup">        
+   return (<div data-testid="Matchup" className="border p-1 border-slate-50 rounded-lg">
       <h1>{props.league}</h1>
       <div className='team-container'>  
        
@@ -449,7 +448,7 @@ function Matchup(props: MatchupProps) {
 
       </div>
       
-      </MatchupWrapper> )
+      </div> )
 }
 
 export default Matchup;
