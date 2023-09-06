@@ -81,7 +81,7 @@ export default function Home() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col p-12">
+    <main className="flex min-h-screen min-w-full flex-col p-12">
       {/* https://www.youtube.com/watch?v=bGShHOOoC-U */}
 
       {/* https://codesandbox.io/s/awesome-napier-rnveq?fontsize=14 */}
@@ -106,7 +106,7 @@ export default function Home() {
 
 
       {downloads && <p className='text-sm'>This package has {downloads} downloads.</p>}
-      <div style={{display: 'block'}}>
+      <div className='grid grid-cols-3 gap-5'>
         {espnMatchupData && <Matchup league="R.M.L."  matchupData={espnMatchupData} subsEnabled={false} captainsEnabled={false} onChange={updateEspnData}></Matchup> }
         {yahooMatchupData && <Matchup league="The Replacements" matchupData={yahooMatchupData} subsEnabled={true} captainsEnabled={true} onChange={updateYahooData}></Matchup> }        
         {/* <Matchup league="T.R.L."></Matchup>

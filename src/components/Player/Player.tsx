@@ -1,41 +1,39 @@
 'use client';
 
 import React, { FC } from 'react';
-import { PlayerWrapper } from './Player.styled';
 
-interface PlayerProps {playerPosition: string, playerName: string, playerPoints: number, playerSubPoints: number, playerCaptainPoints: number, subbedInFor: string, subbedOutFor: string}
+interface PlayerProps { playerPosition: string, playerName: string, playerPoints: number, playerSubPoints: number, playerCaptainPoints: number, subbedInFor: string, subbedOutFor: string }
 
-const Player: FC<PlayerProps> = ({playerPosition, playerName, playerPoints, playerSubPoints, playerCaptainPoints, subbedInFor, subbedOutFor}) => (
- <PlayerWrapper data-testid="Player">
-    {playerName !== "BENCH" ?
-         <div className="player-container">
-         <div className="position">
-            {playerPosition}
+const Player: FC<PlayerProps> = ({ playerPosition, playerName, playerPoints, playerSubPoints, playerCaptainPoints, subbedInFor, subbedOutFor }) => (
+   <div data-testid="Player">
+      {playerName !== "BENCH" ?
+         <div className="player-container flex-col my-1">
+            <div className='player-position-wrapper flex flex-row gap-3 p-1'>
+            <div className="position text-blue-400">
+               {playerPosition}
+            </div>
+            <div className="name truncate">
+               {playerName}
+            </div>
+            <div className="points text-blue-300">
+               {playerSubPoints !== 0 ? playerSubPoints : playerCaptainPoints !== 0 ? playerCaptainPoints : playerPoints}
+            </div>
+            </div>
+            <div className='subs'>
+               <div className="position">
+                  {subbedInFor !== '' ? `Subbed: ${subbedInFor}` : <></>}
+                  {subbedOutFor !== '' ? subbedOutFor : <></>}
+               </div>
+            </div>
+         </div> :
+         <div className="player-container flex-1">
+            <div className="bench">
+               {playerName}
+            </div>
          </div>
-         <div className="name">
-            {playerName}
-         </div>    
-         <div className="points">
-            {playerSubPoints !== 0 ? playerSubPoints : playerCaptainPoints !== 0 ? playerCaptainPoints : playerPoints}
-         </div>
-         {subbedInFor !== '' ? <div className="position">
-            {subbedInFor}
-         </div> : <></>}
-         {subbedOutFor !== '' ? <div className="position">
-            {subbedOutFor}
-         </div> : <></>}
-       </div> :
-       <div className="player-container">
-       <div className="bench">
-          {playerName}      
-       </div>
-     </div>
-   
-   
-   
-   }
-    
- </PlayerWrapper>
+      }
+
+   </div>
 );
 
 export default Player;
