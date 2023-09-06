@@ -223,7 +223,7 @@ function Matchup(props: MatchupProps) {
                let subbedInForPlayerName = subbedOutPlayer.subbedOutFor;
    
                setHomePlayersToSub(homePlayersToSub.filter(p => p !== subbedOutPlayer.subbedOutFor));
-               setHomeSubs(homeSubs.filter(s => s !== `${subbedInPlayer.playerName}::${playerSubbedOutFor}`))
+               setHomeSubs(homeSubs.filter(s => s !== `${subbedInPlayer.playerName}::${playerSubbedOutFor}`))            
    
                swappedPlayers = homeFilteredPlayers.map(p => {
                   if(p.playerName === playerSubbedOutFor){                        
@@ -235,7 +235,7 @@ function Matchup(props: MatchupProps) {
                   return p;      
                });    
                
-               [swappedPlayers[subbedOutPlayer.order], swappedPlayers[subbedInPlayer.order]] = [swappedPlayers[subbedInPlayer.order], swappedPlayers[subbedOutPlayer.order]];   
+               // [swappedPlayers[subbedOutPlayer.order], swappedPlayers[subbedInPlayer.order]] = [swappedPlayers[subbedInPlayer.order], swappedPlayers[subbedOutPlayer.order]];  
             }
             else{
                let subbedOutPlayer = homeFilteredPlayers.filter(p => p.playerName === playerSubbedOutFor)[0];

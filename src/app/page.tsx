@@ -24,7 +24,7 @@ export default function Home() {
   }
 
   const getData = async () => {
-    // getEspn();
+    getEspn();
     getYahooReplacements();
 
   }

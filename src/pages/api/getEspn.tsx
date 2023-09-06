@@ -16,7 +16,7 @@ const getEspn = async (req: NextApiRequest, res: NextApiResponse) => {
 
     puppeteer.use(StealthPlugin());
 
-    const browser = await puppeteer.launch({headless:false, executablePath:"C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",  
+    const browser = await puppeteer.launch({headless:"new", executablePath:"C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",  
     userDataDir:`${process.env.REACT_APP_DATAL}`
     , args:['--disable-web-security', ' --disable-features=site-per-process']
         });
@@ -25,7 +25,7 @@ const getEspn = async (req: NextApiRequest, res: NextApiResponse) => {
       // await loadCookies(page, 'espn');
 
       await page.setViewport({ width: 1920, height: 1080});
-      await openPage(page, `https://fantasy.espn.com/football/fantasycast?leagueId=127291`);
+      await openPage(page, `https://fantasy.espn.com/football/fantasycast?leagueId=127291&seasonId=2023&teamId=8`);
   
   try{
     await page.waitForSelector('.teamName', { timeout: 10000 });
