@@ -357,36 +357,110 @@ function Matchup(props: MatchupProps) {
       
       return swappedPlayers;
    }
-   
-   return (<div data-testid="Matchup" className="border p-1 border-slate-50 rounded-lg">
-      <h1>{props.league}</h1>
-      <div className='team-container'>  
-       
-         {homeFilteredPlayers && awayFilteredPlayers && homeFilteredPlayers.map((p, index) => (          
-         <Team key={index} 
-         homePlayerName={p.playerName} homePlayerPosition={p.playerPosition} homePlayerPoints={p.playerPoints} 
-         homePlayerSubPoints={p.subPoints} homePlayerCaptainPoints={p.captainPoints} homePlayerSubbedInFor={p.subbedInFor} homePlayerSubbedOutFor={p.subbedOutFor} 
 
-         awayPlayerName={awayFilteredPlayers[index].playerName} awayPlayerPosition={awayFilteredPlayers[index].playerPosition} awayPlayerPoints={awayFilteredPlayers[index].playerPoints} 
-         awayPlayerSubPoints={awayFilteredPlayers[index].subPoints} awayPlayerCaptainPoints={awayFilteredPlayers[index].captainPoints} awayPlayerSubbedInFor={awayFilteredPlayers[index].subbedInFor} awayPlayerSubbedOutFor={awayFilteredPlayers[index].subbedOutFor}></Team>))}
-         {/* {props.matchupData && props.matchupData.homePlayers && props.matchupData.homePlayers.map((p, index) => ( <Team key={index} homePlayer={p} awayPlayer={props.matchupData.awayPlayers[index]}></Team>))} */}
-         
+   return (
+      <div data-testid="matchup" className="border p-1 border-slate-50 rounded-lg">
+         <h1>{props.league}</h1>
+         {
+            homeFilteredPlayers &&
+            awayFilteredPlayers &&
+            homeFilteredPlayers.sort(
+               (n1: PlayerData, n2: PlayerData) => n1.subOrder < n2.subOrder ? -1 : 1).map((p, index) => (
+                   <Team
+                     key={index}
+                     homePlayerName={p.playerName}
+                     homePlayerPosition={p.playerPosition}
+                     homePlayerPoints={p.playerPoints}
+                     homePlayerSubPoints={p.subPoints}
+                     homePlayerCaptainPoints={p.captainPoints}
+                     homePlayerSubbedInFor={p.subbedInFor}
+                     homePlayerSubbedOutFor={p.subbedOutFor}
+                     awayPlayerName={awayFilteredPlayers[index].playerName}
+                     awayPlayerPosition={awayFilteredPlayers[index].playerPosition}
+                     awayPlayerPoints={awayFilteredPlayers[index].playerPoints}
+                     awayPlayerSubPoints={awayFilteredPlayers[index].subPoints}
+                     awayPlayerCaptainPoints={awayFilteredPlayers[index].captainPoints}
+                     awayPlayerSubbedInFor={awayFilteredPlayers[index].subbedInFor}
+                     awayPlayerSubbedOutFor={awayFilteredPlayers[index].subbedOutFor} />                  
+               )
+            )
+         }
+
          {props.captainsEnabled && homeFilteredPlayers && homeFilteredPlayers.length > 0 &&
-         <div style={{width: '50%'}}>                
+            <div style={{ width: '50%' }}>
                <p>Select Captain</p>
                <select
-                  className="select-button"     
+                  className="select-button"
                   value={homeCaptain}
                   onChange={(e) => setCaptainAndUpdatePoints(e.target.value, true)}>
                   <option></option>
-                  
-                  {[...homeFilteredPlayers].sort((n1:PlayerData, n2:PlayerData) => n1.order < n2.order ? -1 : 1).map((p, index) => (
+
+                  {homeFilteredPlayers.sort((n1: PlayerData, n2: PlayerData) => n1.order < n2.order ? -1 : 1).map((p, index) => (
                      <option key={index} value={p.playerName}>{p.playerName}</option>
                   ))};
-                  
-               </select>            
+
+               </select>
+            </div>
+         }
+         {props.captainsEnabled && awayFilteredPlayers && awayFilteredPlayers.length > 0 &&
+            <div style={{ width: '50%' }}>
+               <p>Select Captain</p>
+               <select
+                  className="select-button"
+                  value={awayCaptain}
+                  onChange={(e) => setCaptainAndUpdatePoints(e.target.value, false)}>
+                  <option></option>
+
+                  {awayFilteredPlayers.sort((n1: PlayerData, n2: PlayerData) => n1.order < n2.order ? -1 : 1).map((p, index) => (
+                     <option key={index} value={p.playerName}>{p.playerName}</option>
+                  ))};
+
+               </select>
+            </div>
+         }
+
+         <div style={{ width: '50%' }}>
+            {props.subsEnabled && homeFilteredPlayers && homeFilteredPlayers.filter(p => p.isStarter)
+               .sort((n1: PlayerData, n2: PlayerData) => n1.order < n2.order ? -1 : 1).map((p, index) => (
+                  <>
+                     <p>{p.playerName !== '' ? p.playerName + ": " + p.matchupPosition : p.matchupPosition}</p>
+                     <select
+                        className="select-button"
+                        value={p.subbedOutFor}
+                        onChange={(e) => setPlayerSubsByName(e.target.value, p.playerName, true, [])}>
+                        {p.subbedOutFor ? <><option selected>{p.subbedOutFor}</option> <option></option></> : <option></option>}
+
+                        {homeFilteredPlayers && homeFilteredPlayers.filter(b => !b.isStarter && b.playerName !== "BENCH" &&
+                           getAvailableSubPositions(p.matchupPosition).includes(b.playerPosition) &&
+                           !homePlayersToSub.some(a => a === b.playerName)).map((b, index) =>
+                              <option key={index} value={b.playerName}>{b.playerName}</option>
+                           )};
+                     </select>
+                  </>
+               ))}
          </div>
-         } 
+
+         <div style={{ width: '50%' }}>
+            {props.subsEnabled && awayFilteredPlayers && awayFilteredPlayers.filter(p => p.isStarter)
+               .sort((n1: PlayerData, n2: PlayerData) => n1.order < n2.order ? -1 : 1).map((p, index) => (
+                  <>
+                     <p>{p.playerName !== '' ? p.playerName + ": " + p.matchupPosition : p.matchupPosition}</p>
+                     <select
+                        className="select-button"
+                        value={p.subbedOutFor}
+                        onChange={(e) => setPlayerSubsByName(e.target.value, p.playerName, false, [])}>
+                        {p.subbedOutFor ? <><option selected>{p.subbedOutFor}</option> <option></option></> : <option></option>}
+
+                        {awayFilteredPlayers && awayFilteredPlayers.filter(b => !b.isStarter && b.playerName !== "BENCH" &&
+                           getAvailableSubPositions(p.matchupPosition).includes(b.playerPosition) &&
+                           !awayPlayersToSub.some(a => a === b.playerName)).map((b, index) =>
+                              <option key={index} value={b.playerName}>{b.playerName}</option>
+                           )};
+                     </select>
+                  </>
+               ))}
+         </div>
+
          {props.captainsEnabled && awayFilteredPlayers && awayFilteredPlayers.length > 0 &&
          <div style={{width: '50%'}}>                
                <p>Select Captain</p>
@@ -448,7 +522,7 @@ function Matchup(props: MatchupProps) {
 
       </div>
       
-      </div> )
+   )
 }
 
 export default Matchup;

@@ -80,7 +80,7 @@ export default function Home() {
   }
 
   return (
-    <main className="flex min-h-screen min-w-full flex-col p-12">
+    <main className="min-h-screen w-full">
       {/* https://www.youtube.com/watch?v=bGShHOOoC-U */}
 
       {/* https://codesandbox.io/s/awesome-napier-rnveq?fontsize=14 */}
@@ -105,9 +105,9 @@ export default function Home() {
 
 
       {downloads && <p className='text-sm'>This package has {downloads} downloads.</p>}
-      <div className='grid grid-cols-3 gap-5'>
-        {espnMatchupData && <Matchup league="R.M.L." input={input} matchupData={espnMatchupData} subsEnabled={false} captainsEnabled={false} onChange={updateEspnData}></Matchup> }
-        {yahooMatchupData && <Matchup league="The Replacements" input={input} matchupData={yahooMatchupData} subsEnabled={true} captainsEnabled={true} onChange={updateYahooData}></Matchup> }        
+      <div className='grid grid-cols-3 gap-2'>
+        {espnMatchupData && <Matchup league="R.M.L."  matchupData={espnMatchupData} subsEnabled={false} captainsEnabled={false} onChange={updateEspnData}></Matchup> }
+        {yahooMatchupData && <Matchup league="The Replacements" matchupData={yahooMatchupData} subsEnabled={true} captainsEnabled={true} onChange={updateYahooData}></Matchup> }        
         {/* <Matchup league="T.R.L."></Matchup>
         <Matchup league="P.J.V."></Matchup>
         <Matchup league="Soopa Brawl"></Matchup>

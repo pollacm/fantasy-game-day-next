@@ -5,15 +5,39 @@ import Player from '../Player/Player';
 import { PlayerData } from '../Player/PlayerData';
 
 interface TeamProps {
-    homePlayerName: string, homePlayerPosition: string, homePlayerPoints: number, homePlayerSubPoints: number, homePlayerCaptainPoints: number, homePlayerSubbedInFor: string, homePlayerSubbedOutFor: string,
-    awayPlayerName: string, awayPlayerPosition: string, awayPlayerPoints: number, awayPlayerSubPoints: number, awayPlayerCaptainPoints: number, awayPlayerSubbedInFor: string, awayPlayerSubbedOutFor: string,
+    homePlayerName: string,
+    homePlayerPosition: string,
+    homePlayerPoints: number,
+    homePlayerSubPoints: number,
+    homePlayerCaptainPoints: number,
+    homePlayerSubbedInFor: string,
+    homePlayerSubbedOutFor: string,
+    awayPlayerName: string,
+    awayPlayerPosition: string,
+    awayPlayerPoints: number,
+    awayPlayerSubPoints: number,
+    awayPlayerCaptainPoints: number,
+    awayPlayerSubbedInFor: string,
+    awayPlayerSubbedOutFor: string,
 }
 
-const Team: FC<TeamProps> = ({ homePlayerName, homePlayerPosition, homePlayerPoints, homePlayerSubPoints, homePlayerCaptainPoints, homePlayerSubbedInFor, homePlayerSubbedOutFor,
-    awayPlayerName, awayPlayerPosition, awayPlayerPoints, awayPlayerSubPoints, awayPlayerCaptainPoints, awayPlayerSubbedInFor, awayPlayerSubbedOutFor, }) => (
-        <div data-testid="Team" className="flex justify-between text-xs">
-        
-        <Player key="1" playerPosition={homePlayerPosition} 
+const Team: FC<TeamProps> = ({
+    homePlayerName,
+    homePlayerPosition,
+    homePlayerPoints,
+    homePlayerSubPoints,
+    homePlayerCaptainPoints,
+    homePlayerSubbedInFor,
+    homePlayerSubbedOutFor,
+    awayPlayerName,
+    awayPlayerPosition,
+    awayPlayerPoints,
+    awayPlayerSubPoints,
+    awayPlayerCaptainPoints,
+    awayPlayerSubbedInFor,
+    awayPlayerSubbedOutFor }) => (
+    <div data-testid={`position-${homePlayerPosition}`} className="flex col-span-2 justify-between">
+        <Player key="1" playerPosition={homePlayerPosition}
             playerName={homePlayerName}
             playerPoints={homePlayerPoints}
             playerSubPoints={homePlayerSubPoints}
@@ -27,8 +51,7 @@ const Team: FC<TeamProps> = ({ homePlayerName, homePlayerPosition, homePlayerPoi
             playerCaptainPoints={awayPlayerCaptainPoints}
             subbedInFor={awayPlayerSubbedInFor}
             subbedOutFor={awayPlayerSubbedOutFor}></Player>
-        
- </div>
+    </div>
 );
 
 export default Team;
