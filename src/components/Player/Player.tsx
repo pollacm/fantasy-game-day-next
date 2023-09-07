@@ -18,6 +18,7 @@ interface PlayerProps {
 function Player(props: PlayerProps) 
 {
    const [highlightColor, setHighlightColor] = useState(false)
+   const [gameInfoColor, setGameInfoColor] = useState('gray')
    
    useEffect(() => {
       const subtractMinutes = (date: Date, minutes: number): Date => {
@@ -41,6 +42,23 @@ function Player(props: PlayerProps)
       
    }, [props.lastUpdateTime]);
 
+   useEffect(() => {
+      if(props.gameInfo.toLowerCase().includes('final'))
+      {
+         setGameInfoColor('gray');
+      }
+      else if(props.gameInfo.toLowerCase().includes('sun') || props.gameInfo.toLowerCase().includes('mon') || props.gameInfo.toLowerCase().includes('tue') ||
+      props.gameInfo.toLowerCase().includes('wed') || props.gameInfo.toLowerCase().includes('thu') || props.gameInfo.toLowerCase().includes('fri') ||
+      props.gameInfo.toLowerCase().includes('sat'))
+      {
+         setGameInfoColor('black');
+      }
+      else{
+         setGameInfoColor('blue');
+      }
+      
+   }, [props.gameInfo]);
+
    return (
       <>
          {props.playerName !== "BENCH" ?
@@ -52,7 +70,10 @@ function Player(props: PlayerProps)
                   <div className="name truncate">
                      {props.playerName}
                   </div>
-                  <div className="text-gray-500 text-sm">
+                  <div className="text-gray-500 text-sm"
+                  style={{
+                     color: gameInfoColor
+                  }}>
                    {props.gameInfo}
                   </div>                    
                   <div className="points text-blue-300"
