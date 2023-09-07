@@ -24,6 +24,7 @@ function Matchup(props: MatchupProps) {
    const [awayTotalPoints, setAwayTotalPoints] = useState(0)
    const [awayTeamMyTeam, awayhomeTeamMyTeam] = useState('')
 
+   //TODO: NEED TO MOVE THESE TO A CONFIG FILE TO BE SET PER TEAM
    const myTeamNames = ['bama blackout', 'the hurt bizness', "movin' on up", 'pain train'];
 
     useEffect(() => {
