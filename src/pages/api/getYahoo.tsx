@@ -115,6 +115,22 @@ const getYahoo = async (req: NextApiRequest, res: NextApiResponse) => {
       awayUpdatedPlayerPoints = points != null && !isNaN(points) ? points : 0;
     }
 
+    //game info
+    let gameInfoElements = await row.$$('span.ysf-game-status a');
+    let homePlayerFromUILastGameInfo = '';
+    let awayPlayerFromUILastGameInfo = '';
+    if (gameInfoElements.length == 2) {
+      let text = await gameInfoElements[0].evaluate(el => el.textContent);
+      if (text) {
+        homePlayerFromUILastGameInfo = text;
+      }
+
+      text = await gameInfoElements[1].evaluate(el => el.textContent);
+      if (text) {
+        awayPlayerFromUILastGameInfo = text;
+      }
+    }
+
     //is bench
     let matchupPositionElement = await row.$('td.Ta-c div');
     let matchupPosition = '';
@@ -134,7 +150,13 @@ const getYahoo = async (req: NextApiRequest, res: NextApiResponse) => {
         homePlayerFromUIName = homePlayerFromUI.playerName;
         homePlayerFromUIPoints = homePlayerFromUI.playerPoints;
         homePlayerFromUIPointDiff = homePlayerFromUI.playerPointDiff;
-        homePlayerFromUILastUpdate = homePlayerFromUI.playerLastUpdate;
+
+        if(homePlayerFromUI.playerPoints != homeUpdatedPlayerPoints){
+          homePlayerFromUILastUpdate = new Date().toString();
+        }
+        else{
+          homePlayerFromUILastUpdate = homePlayerFromUI.playerLastUpdate;
+        }        
     }
 
     let awayPlayerFromUI = yahooMatchupData.awayPlayers.find((element) => element.playerName === awayUpdatedPlayerName);
@@ -147,14 +169,20 @@ const getYahoo = async (req: NextApiRequest, res: NextApiResponse) => {
         awayPlayerFromUIName = awayPlayerFromUI.playerName;
         awayPlayerFromUIPoints = awayPlayerFromUI.playerPoints;
         awayPlayerFromUIPointDiff = awayPlayerFromUI.playerPointDiff;
-        awayPlayerFromUILastUpdate = awayPlayerFromUI.playerLastUpdate;
+        
+        if(awayPlayerFromUI.playerPoints != homeUpdatedPlayerPoints){
+          awayPlayerFromUILastUpdate = new Date().toString();
+        }
+        else{
+          homePlayerFromUILastUpdate = awayPlayerFromUI.playerLastUpdate;
+        } 
     }
 
     //add break in first bench position
     if(!isPlayerStarting(matchupPosition) && !firstBench)
     {
-        syncedMatchupData.awayPlayers.push(new PlayerData(count, count, 'BENCH','BENCH','BENCH',0,0,0,'', '','', '', 0,0,false));
-        syncedMatchupData.homePlayers.push(new PlayerData(count, count, 'BENCH','BENCH','BENCH',0,0,0,'', '','','',0,0,false));
+        syncedMatchupData.awayPlayers.push(new PlayerData(count, count, 'BENCH','BENCH','BENCH',0,0,0,'','', '','', '', 0,0,false));
+        syncedMatchupData.homePlayers.push(new PlayerData(count, count, 'BENCH','BENCH','BENCH',0,0,0,'','', '','','',0,0,false));
         count++;
         
         firstBench = true;        
@@ -163,9 +191,11 @@ const getYahoo = async (req: NextApiRequest, res: NextApiResponse) => {
     {
       continue;
     }
-    let homePlayerData = new PlayerData(count, homePlayerFromUI?.subOrder ?? count, homePlayerFromUIName, homeUpdatedPlayerName,homePlayerPosition,homePlayerFromUIPoints,homeUpdatedPlayerPoints, homePlayerFromUIPointDiff, homePlayerFromUILastUpdate,
+    let homePlayerData = new PlayerData(count, homePlayerFromUI?.subOrder ?? count, homePlayerFromUIName, homeUpdatedPlayerName,homePlayerPosition,homePlayerFromUIPoints,homeUpdatedPlayerPoints, 
+        homePlayerFromUIPointDiff, homePlayerFromUILastGameInfo, homePlayerFromUILastUpdate,
         homePlayerFromUI?.subbedOutFor ?? '', homePlayerFromUI?.subbedInFor ?? '', matchupPosition, homePlayerFromUI?.subPoints ?? 0, homePlayerFromUI?.captainPoints ?? 0,isPlayerStarting(matchupPosition));
-    let awayPlayerData = new PlayerData(count, awayPlayerFromUI?.subOrder ?? count, awayPlayerFromUIName, awayUpdatedPlayerName, awayPlayerPosition,awayPlayerFromUIPoints,awayUpdatedPlayerPoints, awayPlayerFromUIPointDiff, awayPlayerFromUILastUpdate,
+    let awayPlayerData = new PlayerData(count, awayPlayerFromUI?.subOrder ?? count, awayPlayerFromUIName, awayUpdatedPlayerName, awayPlayerPosition,awayPlayerFromUIPoints,awayUpdatedPlayerPoints, 
+        awayPlayerFromUIPointDiff, awayPlayerFromUILastGameInfo, awayPlayerFromUILastUpdate,
         awayPlayerFromUI?.subbedOutFor ?? '', awayPlayerFromUI?.subbedInFor ?? '', matchupPosition, awayPlayerFromUI?.subPoints ?? 0, awayPlayerFromUI?.captainPoints ?? 0,isPlayerStarting(matchupPosition));
 
     syncedMatchupData.homePlayers.push(homePlayerData);

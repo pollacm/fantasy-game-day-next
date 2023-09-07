@@ -1,6 +1,6 @@
 'use client';
 
-import React, { FC } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 
 interface PlayerProps {
    playerPosition: string,
@@ -9,47 +9,80 @@ interface PlayerProps {
    playerSubPoints: number,
    playerCaptainPoints: number,
    subbedInFor: string,
-   subbedOutFor: string
+   subbedOutFor: string,
+   lastUpdateTime: string,
+   gameInfo: string,
+   isMyTeam: boolean
 }
 
-const Player: FC<PlayerProps> = ({
-   playerPosition,
-   playerName,
-   playerPoints,
-   playerSubPoints,
-   playerCaptainPoints,
-   subbedInFor,
-   subbedOutFor
-}) => (
-   <>
-      {playerName !== "BENCH" ?
-         <>
-            <div className='player-info flex gap-2 col-span-2 text-xs p-1'>
-               <div className="position text-blue-400">
-                  {playerPosition}
-               </div>
-               <div className="name truncate">
-                  {playerName}
-               </div>
-               <div className="points text-blue-300">
-                  {playerSubPoints !== 0 ? playerSubPoints : playerCaptainPoints !== 0 ? playerCaptainPoints : playerPoints}
-               </div>
-            </div>
-            <div className='subs'>
-               <div className="position">
-                  {subbedInFor !== '' ? `Subbed: ${subbedInFor}` : <></>}
-                  {subbedOutFor !== '' ? subbedOutFor : <></>}
-               </div>
-            </div>
-         </>
-         :
-         <div className="player-container flex-1">
-            <div className="bench">
-               {playerName}
-            </div>
-         </div>
+function Player(props: PlayerProps) 
+{
+   const [highlightColor, setHighlightColor] = useState(false)
+   
+   useEffect(() => {
+      const subtractMinutes = (date: Date, minutes: number): Date => {
+         const result = new Date(date);
+         result.setMinutes(result.getMinutes() - minutes);
+         return result;
+      };
+
+      if(props.lastUpdateTime !== '')
+      {
+         const lastUpdateActualTime = new Date(props.lastUpdateTime)
+         const threeMinutesAgo = subtractMinutes(new Date(), 3);
+
+         if(lastUpdateActualTime > threeMinutesAgo){
+            setHighlightColor(true);
+         }
+         else{
+            setHighlightColor(false);
+         }
       }
-   </>
-);
+      
+   }, [props.lastUpdateTime]);
+
+   return (
+      <>
+         {props.playerName !== "BENCH" ?
+            <>
+               <div className='player-info flex gap-2 col-span-2 text-xs p-1'>
+                  <div className="position text-blue-400">
+                     {props.playerPosition}
+                  </div>
+                  <div className="name truncate">
+                     {props.playerName}
+                  </div>
+                  <div className="text-gray-500 text-sm">
+                   {props.gameInfo}
+                  </div>                    
+                  <div className="points text-blue-300"
+                  style={{
+                     color: highlightColor ? props.isMyTeam ? "green" : "red" : "black",
+                     fontSize: highlightColor ? "15px" : "12px",
+                     fontWeight: highlightColor ? "900" : "normal",
+                     transition: "all .5s ease",
+                     WebkitTransition: "all .5s ease",
+                     MozTransition: "all .5s ease"
+                   }}>
+                     {props.playerSubPoints !== 0 ? props.playerSubPoints : props.playerCaptainPoints !== 0 ? props.playerCaptainPoints : props.playerPoints}
+                  </div>
+               </div>                            
+               <div className='subs'>
+                  <div className="position">
+                     {props.subbedInFor !== '' ? `Subbed: ${props.subbedInFor}` : <></>}
+                     {props.subbedOutFor !== '' ? props.subbedOutFor : <></>}
+                  </div>
+               </div>
+            </>
+            :
+            <div className="player-container flex-1">
+               <div className="bench">
+                  {props.playerName}
+               </div>
+            </div>
+         }
+      </>
+   )
+}
 
 export default Player;

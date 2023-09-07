@@ -87,7 +87,7 @@ export function updatePlayer(player: PlayerData)
         else if(player.playerPoints !== player.incomingPlayerPoints)
         {
             player.playerPointDiff = player.incomingPlayerPoints - player.playerPoints;
-            player.playerLastUpdate = new Date().toLocaleTimeString();
+            player.playerLastUpdate = new Date().toString();
 
             player.playerPoints = player.incomingPlayerPoints;            
         }        
@@ -110,34 +110,34 @@ export function swapOutTestData(matchupData: MatchupData, index: string, league:
             
             let newMatchupData = matchupData.awayPlayers.map(p => {
                 if(p.playerName === 'J. Hurts'){                        
-                    return { ...p, playerPoints: 0, incomingPlayerPoints: 21, playerPointDiff: 0, playerLastUpdate: '10:18:48 PM' };
+                    return { ...p, playerPoints: 0, incomingPlayerPoints: 21, playerPointDiff: 0, playerLastUpdate: 'Thu Sep 06 2023 12:31:54 GMT-0400 (Eastern Daylight Time)' };
                 }
                 if(p.playerName === 'R. Stevenson'){                        
-                    return { ...p, playerPoints: 0, incomingPlayerPoints: 100, playerPointDiff: 0, playerLastUpdate: '10:18:48 PM' };
+                    return { ...p, playerPoints: 0, incomingPlayerPoints: 100, playerPointDiff: 0, playerLastUpdate: new Date().toString() };
                 }
                 if(p.playerName === 'A. St. Brown'){                        
-                    return { ...p, playerPoints: 0, incomingPlayerPoints: 46, playerPointDiff: 0, playerLastUpdate: '10:18:48 PM' };
+                    return { ...p, playerPoints: 0, incomingPlayerPoints: 46, playerPointDiff: 0, playerLastUpdate: subtractMinutes(new Date(), 2) };
                 }
                 if(p.playerName === 'S. Barkley'){                        
-                    return { ...p, playerPoints: 0, incomingPlayerPoints: 125, playerPointDiff: 0, playerLastUpdate: '10:18:48 PM' };
+                    return { ...p, playerPoints: 0, incomingPlayerPoints: 125, playerPointDiff: 0, playerLastUpdate: 'Thu Sep 06 2023 12:31:54 GMT-0400 (Eastern Daylight Time)' };
                 }
                 if(p.playerName === 'T. Pollard'){                        
-                    return { ...p, playerPoints: 0, incomingPlayerPoints: 50, playerPointDiff: 0, playerLastUpdate: '10:18:48 PM' };
+                    return { ...p, playerPoints: 0, incomingPlayerPoints: 50, playerPointDiff: 0, playerLastUpdate: 'Thu Sep 06 2023 12:31:54 GMT-0400 (Eastern Daylight Time)' };
                 }
                 if(p.playerName === 'D. Campbell'){                        
-                    return { ...p, playerPoints: 0, incomingPlayerPoints: 30, playerPointDiff: 0, playerLastUpdate: '10:18:48 PM' };
+                    return { ...p, playerPoints: 0, incomingPlayerPoints: 30, playerPointDiff: 0, playerLastUpdate: '' };
                 }
                 if(p.playerName === 'J. Mixon'){                        
-                    return { ...p, playerPoints: 0, incomingPlayerPoints: 200, playerPointDiff: 0, playerLastUpdate: '10:18:48 PM' };
+                    return { ...p, playerPoints: 0, incomingPlayerPoints: 200, playerPointDiff: 0, playerLastUpdate: '' };
                 }
                 if(p.playerName === 'R. White'){                        
-                    return { ...p, playerPoints: 0, incomingPlayerPoints: 300, playerPointDiff: 0, playerLastUpdate: '10:18:48 PM' };
+                    return { ...p, playerPoints: 0, incomingPlayerPoints: 300, playerPointDiff: 0, playerLastUpdate: 'Thu Sep 06 2023 12:31:54 GMT-0400 (Eastern Daylight Time)' };
                 }
                 if(p.playerName === 'D. London'){                        
-                    return { ...p, playerPoints: 0, incomingPlayerPoints: 250, playerPointDiff: 0, playerLastUpdate: '10:18:48 PM' };
+                    return { ...p, playerPoints: 0, incomingPlayerPoints: 250, playerPointDiff: 0, playerLastUpdate: 'Thu Sep 06 2023 12:31:54 GMT-0400 (Eastern Daylight Time)' };
                 }
                 if(p.playerName === 'C. Holcomb'){                        
-                    return { ...p, playerPoints: 0, incomingPlayerPoints: 150, playerPointDiff: 0, playerLastUpdate: '10:18:48 PM' };
+                    return { ...p, playerPoints: 0, incomingPlayerPoints: 150, playerPointDiff: 0, playerLastUpdate: 'Thu Sep 06 2023 12:31:54 GMT-0400 (Eastern Daylight Time)' };
                 }
                 return p;      
             });    
@@ -148,19 +148,19 @@ export function swapOutTestData(matchupData: MatchupData, index: string, league:
 
             newMatchupData = matchupData.homePlayers.map(p => {
                 if(p.playerName === 'T. Lawrence'){                        
-                    return { ...p, playerPoints: 0, incomingPlayerPoints: 50, playerPointDiff: 0, playerLastUpdate: '10:18:48 PM' };
+                    return { ...p, playerPoints: 0, incomingPlayerPoints: 50, playerPointDiff: 0, playerLastUpdate: subtractMinutes(new Date(), 2) };
                 }
                 if(p.playerName === 'M. Evans'){                        
-                    return { ...p, playerPoints: 0, incomingPlayerPoints: 105, playerPointDiff: 0, playerLastUpdate: '10:18:48 PM' };
+                    return { ...p, playerPoints: 0, incomingPlayerPoints: 105, playerPointDiff: 0, playerLastUpdate: 'Thu Sep 06 2023 12:31:54 GMT-0400 (Eastern Daylight Time)' };
                 }
                 if(p.playerName === 'C. McCaffrey'){                        
-                    return { ...p, playerPoints: 0, incomingPlayerPoints: 110, playerPointDiff: 0, playerLastUpdate: '10:18:48 PM' };
+                    return { ...p, playerPoints: 0, incomingPlayerPoints: 110, playerPointDiff: 0, playerLastUpdate: new Date().toString() };
                 }
                 if(p.playerName === 'J. Goff'){                        
-                    return { ...p, playerPoints: 0, incomingPlayerPoints: 150, playerPointDiff: 0, playerLastUpdate: '10:18:48 PM' };
+                    return { ...p, playerPoints: 0, incomingPlayerPoints: 150, playerPointDiff: 0, playerLastUpdate: '' };
                 }
                 if(p.playerName === 'B. Aiyuk'){                        
-                    return { ...p, playerPoints: 0, incomingPlayerPoints: 200, playerPointDiff: 0, playerLastUpdate: '10:18:48 PM' };
+                    return { ...p, playerPoints: 0, incomingPlayerPoints: 200, playerPointDiff: 0, playerLastUpdate: '' };
                 }
                 return p;      
             });    
@@ -182,34 +182,34 @@ export function swapOutTestData(matchupData: MatchupData, index: string, league:
                     
             let newMatchupData = matchupData.awayPlayers.map(p => {
                 if(p.playerName === 'J. Hurts'){                        
-                    return { ...p, playerPoints: 0, incomingPlayerPoints: 0, playerPointDiff: 0, playerLastUpdate: '10:18:48 PM' };
+                    return { ...p, playerPoints: 0, incomingPlayerPoints: 0, playerPointDiff: 0, playerLastUpdate: 'Thu Sep 06 2023 12:31:54 GMT-0400 (Eastern Daylight Time)' };
                 }
                 if(p.playerName === 'R. Stevenson'){                        
-                    return { ...p, playerPoints: 0, incomingPlayerPoints: 0, playerPointDiff: 0, playerLastUpdate: '10:18:48 PM' };
+                    return { ...p, playerPoints: 0, incomingPlayerPoints: 0, playerPointDiff: 0, playerLastUpdate: 'Thu Sep 06 2023 12:31:54 GMT-0400 (Eastern Daylight Time)' };
                 }
                 if(p.playerName === 'A. St. Brown'){                        
-                    return { ...p, playerPoints: 0, incomingPlayerPoints: 0, playerPointDiff: 0, playerLastUpdate: '10:18:48 PM' };
+                    return { ...p, playerPoints: 0, incomingPlayerPoints: 0, playerPointDiff: 0, playerLastUpdate: 'Thu Sep 06 2023 12:31:54 GMT-0400 (Eastern Daylight Time)' };
                 }
                 if(p.playerName === 'S. Barkley'){                        
-                    return { ...p, playerPoints: 0, incomingPlayerPoints: 0, playerPointDiff: 0, playerLastUpdate: '10:18:48 PM' };
+                    return { ...p, playerPoints: 0, incomingPlayerPoints: 0, playerPointDiff: 0, playerLastUpdate: 'Thu Sep 06 2023 12:31:54 GMT-0400 (Eastern Daylight Time)' };
                 }
                 if(p.playerName === 'T. Pollard'){                        
-                    return { ...p, playerPoints: 0, incomingPlayerPoints: 0, playerPointDiff: 0, playerLastUpdate: '10:18:48 PM' };
+                    return { ...p, playerPoints: 0, incomingPlayerPoints: 0, playerPointDiff: 0, playerLastUpdate: 'Thu Sep 06 2023 12:31:54 GMT-0400 (Eastern Daylight Time)' };
                 }
                 if(p.playerName === 'D. Campbell'){                        
-                    return { ...p, playerPoints: 0, incomingPlayerPoints: 0, playerPointDiff: 0, playerLastUpdate: '10:18:48 PM' };
+                    return { ...p, playerPoints: 0, incomingPlayerPoints: 0, playerPointDiff: 0, playerLastUpdate: 'Thu Sep 06 2023 12:31:54 GMT-0400 (Eastern Daylight Time)' };
                 }
                 if(p.playerName === 'J. Mixon'){                        
-                    return { ...p, playerPoints: 0, incomingPlayerPoints: 0, playerPointDiff: 0, playerLastUpdate: '10:18:48 PM' };
+                    return { ...p, playerPoints: 0, incomingPlayerPoints: 0, playerPointDiff: 0, playerLastUpdate: 'Thu Sep 06 2023 12:31:54 GMT-0400 (Eastern Daylight Time)' };
                 }
                 if(p.playerName === 'R. White'){                        
-                    return { ...p, playerPoints: 0, incomingPlayerPoints: 0, playerPointDiff: 0, playerLastUpdate: '10:18:48 PM' };
+                    return { ...p, playerPoints: 0, incomingPlayerPoints: 0, playerPointDiff: 0, playerLastUpdate: 'Thu Sep 06 2023 12:31:54 GMT-0400 (Eastern Daylight Time)' };
                 }
                 if(p.playerName === 'D. London'){                        
-                    return { ...p, playerPoints: 0, incomingPlayerPoints: 0, playerPointDiff: 0, playerLastUpdate: '10:18:48 PM' };
+                    return { ...p, playerPoints: 0, incomingPlayerPoints: 0, playerPointDiff: 0, playerLastUpdate: 'Thu Sep 06 2023 12:31:54 GMT-0400 (Eastern Daylight Time)' };
                 }
                 if(p.playerName === 'C. Holcomb'){                        
-                    return { ...p, playerPoints: 0, incomingPlayerPoints: 0, playerPointDiff: 0, playerLastUpdate: '10:18:48 PM' };
+                    return { ...p, playerPoints: 0, incomingPlayerPoints: 0, playerPointDiff: 0, playerLastUpdate: 'Thu Sep 06 2023 12:31:54 GMT-0400 (Eastern Daylight Time)' };
                 }
                 return p;      
             });    
@@ -218,22 +218,22 @@ export function swapOutTestData(matchupData: MatchupData, index: string, league:
 
             newMatchupData = matchupData.homePlayers.map(p => {
                 if(p.playerName === 'T. Lawrence'){                        
-                    return { ...p, playerPoints: 0, incomingPlayerPoints: 0, playerPointDiff: 0, playerLastUpdate: '10:18:48 PM' };
+                    return { ...p, playerPoints: 0, incomingPlayerPoints: 0, playerPointDiff: 0, playerLastUpdate: 'Thu Sep 06 2023 12:31:54 GMT-0400 (Eastern Daylight Time)' };
                 }
                 if(p.playerName === 'M. Evans'){                        
-                    return { ...p, playerPoints: 0, incomingPlayerPoints: 0, playerPointDiff: 0, playerLastUpdate: '10:18:48 PM' };
+                    return { ...p, playerPoints: 0, incomingPlayerPoints: 0, playerPointDiff: 0, playerLastUpdate: 'Thu Sep 06 2023 12:31:54 GMT-0400 (Eastern Daylight Time)' };
                 }
                 if(p.playerName === 'C. McCaffrey'){                        
-                    return { ...p, playerPoints: 0, incomingPlayerPoints: 0, playerPointDiff: 0, playerLastUpdate: '10:18:48 PM' };
+                    return { ...p, playerPoints: 0, incomingPlayerPoints: 0, playerPointDiff: 0, playerLastUpdate: 'Thu Sep 06 2023 12:31:54 GMT-0400 (Eastern Daylight Time)' };
                 }
                 if(p.playerName === 'J. Goff'){                        
-                    return { ...p, playerPoints: 0, incomingPlayerPoints: 0, playerPointDiff: 0, playerLastUpdate: '10:18:48 PM' };
+                    return { ...p, playerPoints: 0, incomingPlayerPoints: 0, playerPointDiff: 0, playerLastUpdate: 'Thu Sep 06 2023 12:31:54 GMT-0400 (Eastern Daylight Time)' };
                 }
                 if(p.playerName === 'B. Aiyuk'){                        
-                    return { ...p, playerPoints: 0, incomingPlayerPoints: 0, playerPointDiff: 0, playerLastUpdate: '10:18:48 PM' };
+                    return { ...p, playerPoints: 0, incomingPlayerPoints: 0, playerPointDiff: 0, playerLastUpdate: 'Thu Sep 06 2023 12:31:54 GMT-0400 (Eastern Daylight Time)' };
                 }
                 if(p.playerName === 'F. Warner'){                        
-                    return { ...p, playerPoints: 0, incomingPlayerPoints: 0, playerPointDiff: 0, playerLastUpdate: '10:18:48 PM' };
+                    return { ...p, playerPoints: 0, incomingPlayerPoints: 0, playerPointDiff: 0, playerLastUpdate: 'Thu Sep 06 2023 12:31:54 GMT-0400 (Eastern Daylight Time)' };
                 }
                 return p;      
             });    
@@ -249,10 +249,10 @@ export function swapOutTestData(matchupData: MatchupData, index: string, league:
             
             let newMatchupData = matchupData.homePlayers.map(p => {
                 if(p.playerName === 'Jared Goff'){                        
-                return { ...p, incomingPlayerPoints: 7 };
+                return { ...p, incomingPlayerPoints: 7, playerLastUpdate: subtractMinutes(new Date(), 2) };
                 }          
                 if(p.playerName === 'Talanoa Hufanga'){
-                    return { ...p, incomingPlayerPoints: 7 };
+                    return { ...p, incomingPlayerPoints: 7, playerLastUpdate: new Date().toString() };
                 }          
                 if(p.playerName === 'Jaylen Waddle'){
                     return { ...p, incomingPlayerPoints: 7 };
@@ -266,10 +266,10 @@ export function swapOutTestData(matchupData: MatchupData, index: string, league:
 
             newMatchupData = matchupData.awayPlayers.map(p => {
                 if(p.playerName === 'Rhamondre Stevenson'){
-                    return { ...p, incomingPlayerPoints: 7 };
+                    return { ...p, incomingPlayerPoints: 7, playerLastUpdate:  new Date().toString() };
                 }          
                 if(p.playerName === 'Nick Chubb'){
-                    return { ...p, incomingPlayerPoints: 7 };
+                    return { ...p, incomingPlayerPoints: 7, playerLastUpdate: subtractMinutes(new Date(), 2) };
                 }                      
                 return p;      
             });    
@@ -287,13 +287,13 @@ export function swapOutTestData(matchupData: MatchupData, index: string, league:
                     
             let newMatchupData = matchupData.homePlayers.map(p => {
                 if(p.playerName === 'Jared Goff'){                        
-                    return { ...p, playerPoints: 7, incomingPlayerPoints: 7, playerPointDiff: 7, playerLastUpdate: '10:18:48 PM' };
+                    return { ...p, playerPoints: 7, incomingPlayerPoints: 7, playerPointDiff: 7, playerLastUpdate: 'Thu Sep 06 2023 12:31:54 GMT-0400 (Eastern Daylight Time)' };
                 }          
                 if(p.playerName === 'Talanoa Hufanga'){
-                    return { ...p, playerPoints: 11, incomingPlayerPoints: 17, playerPointDiff: 11, playerLastUpdate: '10:18:48 PM' };
+                    return { ...p, playerPoints: 11, incomingPlayerPoints: 17, playerPointDiff: 11, playerLastUpdate: subtractMinutes(new Date(), 2) };
                 }          
                 if(p.playerName === 'Jaylen Waddle'){
-                    return { ...p, playerPoints: 6, incomingPlayerPoints: 21, playerPointDiff: 6, playerLastUpdate: '10:18:48 PM' };
+                    return { ...p, playerPoints: 6, incomingPlayerPoints: 21, playerPointDiff: 6, playerLastUpdate: new Date().toString() };
                 }          
                 return p;      
             });    
@@ -302,10 +302,10 @@ export function swapOutTestData(matchupData: MatchupData, index: string, league:
 
             newMatchupData = matchupData.awayPlayers.map(p => {
                 if(p.playerName === 'Rhamondre Stevenson'){
-                    return { ...p, incomingPlayerName: 'Johan Dotson', playerPosition: 'WR', playerPoints: 4, incomingPlayerPoints: 0, playerPointDiff: 4, playerLastUpdate: '10:18:48 PM'};
+                    return { ...p, incomingPlayerName: 'Johan Dotson', playerPosition: 'WR', playerPoints: 4, incomingPlayerPoints: 0, playerPointDiff: 4, playerLastUpdate:subtractMinutes(new Date(), 2)};
                 }          
                 if(p.playerName === 'Nick Chubb'){
-                    return { ...p, playerPoints: 14, incomingPlayerPoints: 14, playerPointDiff: 14, playerLastUpdate: '10:18:48 PM' };
+                    return { ...p, playerPoints: 14, incomingPlayerPoints: 14, playerPointDiff: 14, playerLastUpdate: 'Thu Sep 06 2023 12:31:54 GMT-0400 (Eastern Daylight Time)' };
                 }                      
                 return p;      
             });    
@@ -316,3 +316,9 @@ export function swapOutTestData(matchupData: MatchupData, index: string, league:
 
     return matchupData;
 }
+
+const subtractMinutes = (date: Date, minutes: number): string => {
+    const result = new Date(date);
+    result.setMinutes(result.getMinutes() - minutes);
+    return result.toString();
+};

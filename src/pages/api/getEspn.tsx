@@ -135,6 +135,22 @@ const getEspn = async (req: NextApiRequest, res: NextApiResponse) => {
       awayUpdatedPlayerPoints = points != null && !isNaN(points) ? points : 0;
     }
 
+    //game info
+    let gameInfoElements = await row.$$('div.game-status-inline span');
+    let homePlayerFromUILastGameInfo = '';
+    let awayPlayerFromUILastGameInfo = '';
+    if (gameInfoElements.length == 2) {
+      let text = await gameInfoElements[0].evaluate(el => el.textContent);
+      if (text) {
+        homePlayerFromUILastGameInfo = text;
+      }
+
+      text = await gameInfoElements[1].evaluate(el => el.textContent);
+      if (text) {
+        awayPlayerFromUILastGameInfo = text;
+      }
+    }
+
     //is bench
     let matchupPositionElement = await row.$('td.slotColumn div');
     let matchupPosition = '';
@@ -151,12 +167,19 @@ const getEspn = async (req: NextApiRequest, res: NextApiResponse) => {
       let homePlayerFromUIPoints = 0.00;
       let homePlayerFromUIPointDiff = 0.00;
       let homePlayerFromUILastUpdate = '';
+      
 
       if(homePlayerFromUI != null){
           homePlayerFromUIName = homePlayerFromUI.playerName;
+          if(homePlayerFromUI.playerPoints != homeUpdatedPlayerPoints){
+            homePlayerFromUILastUpdate = new Date().toString();
+          }
+          else{
+            homePlayerFromUILastUpdate = homePlayerFromUI.playerLastUpdate;
+          }
+
           homePlayerFromUIPoints = homePlayerFromUI.playerPoints;
           homePlayerFromUIPointDiff = homePlayerFromUI.playerPointDiff;
-          homePlayerFromUILastUpdate = homePlayerFromUI.playerLastUpdate;
       }
 
       let awayPlayerFromUI = espnMatchupData.awayPlayers.find((element) => element.playerName === awayUpdatedPlayerName);
@@ -167,15 +190,23 @@ const getEspn = async (req: NextApiRequest, res: NextApiResponse) => {
 
       if(awayPlayerFromUI != null){
           awayPlayerFromUIName = awayPlayerFromUI.playerName;
+          if(awayPlayerFromUI.playerPoints != homeUpdatedPlayerPoints){
+            homePlayerFromUILastUpdate = new Date().toString();
+          }
+          else{
+            homePlayerFromUILastUpdate = awayPlayerFromUI.playerLastUpdate;
+          }
+
           awayPlayerFromUIPoints = awayPlayerFromUI.playerPoints;
           awayPlayerFromUIPointDiff = awayPlayerFromUI.playerPointDiff;
-          awayPlayerFromUILastUpdate = awayPlayerFromUI.playerLastUpdate;
       }
 
-      let homePlayerData = new PlayerData(count, homePlayerFromUI?.subOrder ?? count, homePlayerFromUIName, homeUpdatedPlayerName,homePlayerPosition,homePlayerFromUIPoints,homeUpdatedPlayerPoints, homePlayerFromUIPointDiff, homePlayerFromUILastUpdate,
+      let homePlayerData = new PlayerData(count, homePlayerFromUI?.subOrder ?? count, homePlayerFromUIName, homeUpdatedPlayerName,homePlayerPosition,homePlayerFromUIPoints,homeUpdatedPlayerPoints,
+                                         homePlayerFromUIPointDiff, homePlayerFromUILastGameInfo, homePlayerFromUILastUpdate,
                                          homePlayerFromUI?.subbedOutFor ?? '', homePlayerFromUI?.subbedInFor ?? '', '',0,0, isPlayerStarting(matchupPosition));
 
-      let awayPlayerData = new PlayerData(count, awayPlayerFromUI?.subOrder ?? count, awayPlayerFromUIName, awayUpdatedPlayerName, awayPlayerPosition,awayPlayerFromUIPoints,awayUpdatedPlayerPoints, awayPlayerFromUIPointDiff, awayPlayerFromUILastUpdate,
+      let awayPlayerData = new PlayerData(count, awayPlayerFromUI?.subOrder ?? count, awayPlayerFromUIName, awayUpdatedPlayerName, awayPlayerPosition,awayPlayerFromUIPoints,awayUpdatedPlayerPoints, 
+                                          awayPlayerFromUIPointDiff, awayPlayerFromUILastGameInfo,awayPlayerFromUILastUpdate,
                                          awayPlayerFromUI?.subbedOutFor ?? '', awayPlayerFromUI?.subbedInFor ?? '','',0,0,isPlayerStarting(matchupPosition));
                                           
       syncedMatchupData.homePlayers.push(homePlayerData);
