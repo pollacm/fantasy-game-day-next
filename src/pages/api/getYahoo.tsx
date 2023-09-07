@@ -10,6 +10,7 @@ const getYahoo = async (req: NextApiRequest, res: NextApiResponse) => {
     let syncedMatchupData = new MatchupData('','',[], []);
     let {input} = JSON.parse(req.body);
     let {league} = JSON.parse(req.body);
+    let {matchupQuery} = JSON.parse(req.body);
     console.log('input', input);
 
     // const browser = await puppeteer.launch({headless:true, args:[
@@ -23,7 +24,7 @@ const getYahoo = async (req: NextApiRequest, res: NextApiResponse) => {
     //   await loadCookies(page, league);
 
       await page.setViewport({ width: 1920, height: 1080});
-      await openPage(page, `https://football.fantasysports.yahoo.com/f1/${league}/matchup`);
+      await openPage(page, `https://football.fantasysports.yahoo.com/f1/${league}/matchup?${matchupQuery}`);
   
     await page.waitForSelector('#statTable1', { timeout: 10000 });
 

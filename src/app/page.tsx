@@ -11,6 +11,7 @@ export default function Home() {
   const [downloads, setDownloads] = useState<string>('');
   const [espnMatchupData, setEspnMatchupData] = useState<MatchupData>(new MatchupData('','', [], []));
   const [yahooMatchupData, setYahooMatchupData] = useState<MatchupData>(new MatchupData('','', [], []));
+  const [yahooPjVMatchupData, setYahooPjVMatchupData] = useState<MatchupData>(new MatchupData('','', [], []));
   const [input, setInput] = useState<string>('');
   
 
@@ -26,6 +27,7 @@ export default function Home() {
   const getData = async () => {
     getEspn();
     getYahooReplacements();
+    getYahooPjV();
   }
 
   const getEspn = async () => {
@@ -68,7 +70,7 @@ export default function Home() {
   const getYahooReplacements = async () => {
     const res = await fetch('http://localhost:3000/api/getYahoo', {
       method: 'POST',
-      body: JSON.stringify({yahooMatchupData, league: '32919', input: input})
+      body: JSON.stringify({yahooMatchupData, league: '32919', input: input, matchupQuery:'week=1&mid1=1&mid2=2'})
     })
     console.log('out of api')
     const { matchupData } = await res.json();
@@ -77,6 +79,32 @@ export default function Home() {
 
     });
     console.log(yahooMatchupData);
+  }
+
+  const getYahooPjV = async () => {
+    const res = await fetch('http://localhost:3000/api/getYahoo', {
+      method: 'POST',
+      body: JSON.stringify({yahooMatchupData: yahooPjVMatchupData, league: '976396', input: input, matchupQuery: 'week=1&mid1=4&mid2=11'})
+    })
+    console.log('out of api')
+    const { matchupData } = await res.json();
+    setYahooPjVMatchupData({
+      ...matchupData
+
+    });
+    console.log(yahooPjVMatchupData);
+  }
+
+  const updateYahooPjVData = (playerData: PlayerData[], home: boolean) => {
+    let updatedMatchup = yahooPjVMatchupData;
+    if(home){
+      updatedMatchup.homePlayers = playerData;
+    }
+    else{
+      updatedMatchup.awayPlayers = playerData;
+    }
+    
+    setYahooPjVMatchupData(updatedMatchup);
   }
 
   return (
@@ -108,6 +136,7 @@ export default function Home() {
       <div className='grid grid-cols-3 gap-2'>
         {espnMatchupData && <Matchup league="R.M.L." input={input} matchupData={espnMatchupData} subsEnabled={false} captainsEnabled={false} onChange={updateEspnData}></Matchup> }
         {yahooMatchupData && <Matchup league="The Replacements" input={input}  matchupData={yahooMatchupData} subsEnabled={true} captainsEnabled={true} onChange={updateYahooData}></Matchup> }        
+        {yahooPjVMatchupData && <Matchup league="PjV" input={input}  matchupData={yahooPjVMatchupData} subsEnabled={false} captainsEnabled={false} onChange={updateYahooPjVData}></Matchup> }        
         {/* <Matchup league="T.R.L."></Matchup>
         <Matchup league="P.J.V."></Matchup>
         <Matchup league="Soopa Brawl"></Matchup>
