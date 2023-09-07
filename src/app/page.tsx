@@ -106,8 +106,8 @@ export default function Home() {
 
       {downloads && <p className='text-sm'>This package has {downloads} downloads.</p>}
       <div className='grid grid-cols-3 gap-2'>
-        {espnMatchupData && <Matchup league="R.M.L."  matchupData={espnMatchupData} subsEnabled={false} captainsEnabled={false} onChange={updateEspnData}></Matchup> }
-        {yahooMatchupData && <Matchup league="The Replacements" matchupData={yahooMatchupData} subsEnabled={true} captainsEnabled={true} onChange={updateYahooData}></Matchup> }        
+        {espnMatchupData && <Matchup league="R.M.L." input={input} matchupData={espnMatchupData} subsEnabled={false} captainsEnabled={false} onChange={updateEspnData}></Matchup> }
+        {yahooMatchupData && <Matchup league="The Replacements" input={input}  matchupData={yahooMatchupData} subsEnabled={true} captainsEnabled={true} onChange={updateYahooData}></Matchup> }        
         {/* <Matchup league="T.R.L."></Matchup>
         <Matchup league="P.J.V."></Matchup>
         <Matchup league="Soopa Brawl"></Matchup>

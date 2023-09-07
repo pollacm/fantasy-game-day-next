@@ -16,11 +16,16 @@ function Matchup(props: MatchupProps) {
    const [homeSubs, setHomeSubs] = useState<string[]>([])
    const [homeCaptain, setHomeCaptain] = useState<string>('')
    const [homeTotalPoints, setHomeTotalPoints] = useState(0)
+   const [homeTeamMyTeam, sethomeTeamMyTeam] = useState('')
    const [awayFilteredPlayers, setAwayFilteredPlayers] = useState<PlayerData[]>([])
    const [awaySubs, setAwaySubs] = useState<string[]>([])
    const [awayCaptain, setAwayCaptain] = useState<string>('')
    const [awayPlayersToSub, setAwayPlayersToSub] = useState<string[]>([])
    const [awayTotalPoints, setAwayTotalPoints] = useState(0)
+   const [awayTeamMyTeam, awayhomeTeamMyTeam] = useState('')
+
+   //TODO: NEED TO MOVE THESE TO A CONFIG FILE TO BE SET PER TEAM
+   const myTeamNames = ['bama blackout', 'the hurt bizness', "movin' on up", 'pain train'];
 
     useEffect(() => {
       let mappedData = [...props.matchupData.awayPlayers].sort((n1:PlayerData, n2:PlayerData) => n1.subOrder < n2.subOrder ? -1 : 1).map(item => {return item});
@@ -65,6 +70,10 @@ function Matchup(props: MatchupProps) {
       props.onChange(mappedPlayers, false);
 
     }, [awayCaptain])
+
+    const getIsMyTeam = (teamName: string) => {
+      return myTeamNames.includes(teamName.toLowerCase());
+    }
 
     const setCaptainAndUpdatePoints = (captain: string, homeTeam: boolean) => {
          if(homeTeam){
@@ -375,13 +384,19 @@ function Matchup(props: MatchupProps) {
                      homePlayerCaptainPoints={p.captainPoints}
                      homePlayerSubbedInFor={p.subbedInFor}
                      homePlayerSubbedOutFor={p.subbedOutFor}
+                     homePlayerLastUpdateTime={p.playerLastUpdate}
+                     homePlayerGameInfo={p.gameInfo}
+                     homePlayerIsMyTeam={getIsMyTeam(props.matchupData.homeTeamName)}
                      awayPlayerName={awayFilteredPlayers[index].playerName}
                      awayPlayerPosition={awayFilteredPlayers[index].playerPosition}
                      awayPlayerPoints={awayFilteredPlayers[index].playerPoints}
                      awayPlayerSubPoints={awayFilteredPlayers[index].subPoints}
                      awayPlayerCaptainPoints={awayFilteredPlayers[index].captainPoints}
                      awayPlayerSubbedInFor={awayFilteredPlayers[index].subbedInFor}
-                     awayPlayerSubbedOutFor={awayFilteredPlayers[index].subbedOutFor} />                  
+                     awayPlayerSubbedOutFor={awayFilteredPlayers[index].subbedOutFor} 
+                     awayPlayerLastUpdateTime={awayFilteredPlayers[index].playerLastUpdate}
+                     awayPlayerGameInfo={awayFilteredPlayers[index].gameInfo}
+                     awayPlayerIsMyTeam={getIsMyTeam(props.matchupData.awayTeamName)}/>                  
                )
             )
          }
